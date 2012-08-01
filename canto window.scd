@@ -14,7 +14,7 @@
 	MIDIClient.destinations.detect({ |item| 
 		item.device.find( "Babyface" ).notNil 
 	}) !? _.uid ? 0
-).latency_(0);
+).latency_(0.1);
 );
 
 /* // monitor
