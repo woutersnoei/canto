@@ -43,6 +43,52 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 	delays = PitchShift.ar( delays.sum, 0.2, pshift.midiratio, pdisp.midiratio-1, tvar );
 	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * delays * amp );
 }).load(s);
+
+
+
+SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1, latency = 0.02,
+		modSpeed = 5, modAmt = 0, pshift = 0, pdisp = 0, tvar = 0,
+		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000]|
+	var delays, input, index;
+	var trig;
+	var times;
+	var mod;
+	var env;
+	
+	times = \times.kr( 0!20 ).clump(5);
+	
+	mod = SinOsc.ar( 
+		(modSpeed / time) * Rand(0.9.dup(10), 1.1), Rand(0.dup(10),2pi), modAmt.lag(1) 
+	);
+	
+	input = WhiteNoise.ar(1e-10);
+	input = input + In.ar( in + (private * (NumOutputBuses.ir + NumInputBuses.ir) ) + [0,2]).mean;
+	
+	
+	//input = input.wrapExtend( times.size );
+	
+	delays = DelayC.ar( input, 2.1, 
+		((((1,1.5..9)/5) * time) + mod) - (latency + (tvar.lag(5) /2))
+	);
+	delays = BLowCut.ar( delays, lowcut.lag(0.1).clip(20,20000), 4 );
+	delays = BHiCut.ar( delays, hicut.lag(0.1).clip(20,20000), 4 );
+	//index = TIRand.kr(0.dup(4),4, TDelay.kr( In.kr(1), (time/5) - 0.05 ) );
+	trig = TDelay.kr( In.kr(1), (time/5) - 0.05 );
+	index = times.collect({ |times| Demand.kr( trig, trig > 0.9, Dseq( times, inf ) ); });
+	index = (index + TIRand.kr(0.dup(4), vari, trig ));
+	//Poll.kr( trig > 0.9, index );
+	delays = delays.collect({ |item, i|
+		var ampx;
+		i = i/2;
+		ampx = InRange.kr( index, i-0.25, i+0.25 );
+		ampx = Slew.kr( ampx, 20, 20 );
+		item * ampx;
+	});
+	
+	delays = PitchShift.ar( delays.sum, 0.2, pshift.midiratio, pdisp.midiratio-1, tvar );
+	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * delays * amp );
+}).load(s);
+
 );
 
 ~canto.delay.global = ~canto.delay.global ? EM();
@@ -109,7 +155,7 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 
 ~canto.delay.global.start = { |evt|
 	evt.end;
-	evt.synth = Synth( "canto_randdelay", [ \latency, 0, \private, 0 ] ++ 
+	evt.synth = Synth( "canto_randdelay_quadin", [ \latency, 0, \private, 0 ] ++ 
 		evt.getPairs([ 'lowcut', 'hicut', 'times', 'vari', 'amp', 'modSpeed', 'modAmt', 
 			'pshift', 'pdisp', 'tvar', 'time' ]
 		)
@@ -164,7 +210,6 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 };
 );
 
-if( e.notNil ) { ~canto.delay.global.iconnect( 6 ); };
 
 ~canto.delay.input = ~canto.delay.global.copy;
 
@@ -176,6 +221,11 @@ if( e.notNil ) { ~canto.delay.global.iconnect( 6 ); };
 		)
 	);
 };
+
+if( e.notNil ) { 
+	~canto.delay.global.iconnect( 6 );
+	~canto.delay.input.iconnect( 7 );
+ };
 
 (
 if( ~canto.delayWindow.notNil && { ~canto.delayWindow.isClosed.not } ) {
