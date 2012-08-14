@@ -95,7 +95,7 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 	\hpf, 100,
 	\cutup, 0,
 	\cutdur, 0.5/5,
-	\impSpeed, 0.5,
+	\impSpeed, 0.01,
 	\mixImp, 0,
 	\modAmt, 0,
 	\mixShift, 0,
@@ -123,26 +123,43 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 (
 ~canto.freeze1.iconnect = { |evt, index = 0|
 	
+	var cutspec, cutdurspec;
+	var modAmtSpec;
+	
+	cutspec = ControlSpec(0,1, [0,0.999,1]);
+	cutdurspec = ControlSpec(0,1, [0.101,0.1,0.01]);
+	modAmtSpec = ControlSpec(0,1, [0,0.01,1]);
+	
+	
 	e.actions.slider[index] = { |sl|
 		~canto.freeze1.amp = \amp.asSpec.map( sl.value );
 	};
 	e.actions.knob[index] = { |sl|
-		~canto.freeze1.cutup = sl.value;
+		~canto.freeze1.cutup = cutspec.map( sl.value );
+		~canto.freeze1.cutdur = cutdurspec.map( sl.value );
 	};
 	e.actions.slider[index+1] = { |sl|
 		var lpf, hpf, width;
-		width = e.knobs[index+1].value / 2;
-		#hpf, lpf = sl.value.linlin( 0, 1,  0+width,   1-width) + [width.neg, width];
+		width = (1-e.knobs[index+1].value) / 2;
+		#hpf, lpf = sl.value.linlin( 0, 1,  0+width, 1-width) + [width.neg, width];
 		~canto.freeze1.lpf = \freq.asSpec.map(lpf);
 		~canto.freeze1.hpf = \freq.asSpec.map(hpf);
 	};
 	e.actions.knob[index+1] = { |sl|
 		var lpf, hpf, width;
-		width = sl.value / 2;
+		width = (1 - sl.value) / 2;
 		#hpf, lpf = e.sliders[index+1].value
 			.linlin( 0, 1, 0 + width,  1 - width) + [width.neg, width];
 		~canto.freeze1.lpf = \freq.asSpec.map(lpf);
 		~canto.freeze1.hpf = \freq.asSpec.map(hpf);
+	};
+	
+	e.actions.slider[index+2] = { |sl|
+		~canto.freeze1.mixImp = sl.value;
+		~canto.freeze1.modAmt = modAmtSpec.map(sl.value);
+	};
+	e.actions.knob[index+2] = { |sl|
+		~canto.freeze1.mixShift = sl.value;
 	};
 	
 	e.actions.button.rec[index] = { |bt|
@@ -167,7 +184,7 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 		})
 		.put( \cutup, {
 			e.active = false;
-			e.knobs[index].valueAction = evt.cutup;
+			e.knobs[index].valueAction = cutspec.unmap( evt.cutup );
 			e.active = true;
 		})
 		.put( \synth, {
@@ -183,7 +200,7 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 			center = (hpf + width).linlin(0+width,1-width,0,1);
 			e.active = false;
 			e.sliders[index+1].valueAction = center;
-			e.knobs[index+1].valueAction = width*2;
+			e.knobs[index+1].valueAction = 1-(width*2);
 			e.active = true;
 		})
 		.put( \lpf, {
@@ -194,15 +211,22 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 			center = (hpf + width).linlin(0+width,1-width,0,1);
 			e.active = false;
 			e.sliders[index+1].valueAction = center;
-			e.knobs[index+1].valueAction = width*2;
+			e.knobs[index+1].valueAction = 1-(width*2);
+			e.active = true;
+		})
+		.put( \mixImp, {
+			e.active = false;
+			e.sliders[index+2].valueAction = evt.mixImp;
 			e.active = true;
 		});
 		
 		[ \amp, \cutup, \hpf ].do({ |item| evt.changed(item) });
 };
+
+if( e.notNil ) { ~canto.freeze1.iconnect( 0 ); };
 );
 	
-if( e.notNil ) { ~canto.freeze1.iconnect( 0 ); };
+
 
 (
 if( ~canto.freeze1Window.notNil && { ~canto.freeze1Window.isClosed.not } ) {
@@ -248,7 +272,7 @@ RoundView.useWithSkin( (font: Font( "Helvetica", 9 ) ),
 	  \amp, \amp.asSpec,
 	  \fb, [0,1].asSpec,
 	  \cutup, [0,1].asSpec,
-	  \cutdur, [0.1/5,5/5].asSpec,
+	  \cutdur, [0.05/5,5/5].asSpec,
 	  \impSpeed, [0.001,20,\exp].asSpec,
 	  \mixImp, [ 0, 1 ].asSpec,
 	  \modAmt, [0,1].asSpec,
