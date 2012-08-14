@@ -1,7 +1,7 @@
 (
 ~canto = ~canto ? EM();
 
-~canto.latency = (1024 + 64)/44100; // audio i/o latency Babyface: (1024 + 64)/44100
+~canto.latency = (128 + 64)/44100; // audio i/o latency Babyface: (1024 + 64)/44100
 
 ~canto.cutbus = Bus( \control, 1, 1 );
 
