@@ -589,4 +589,15 @@ e.doReset = { |evt, dur = 0.35|
 	
 e.doReset;
 
+// couple master slider to volume
+e.actions.master = { |sl| s.volume.volume = [-inf,6,\db].asSpec.map( sl.value ) };
+
+e.volumeCtrl.remove;
+e.volumeCtrl = SimpleController( s.volume );
+e.volumeCtrl.put( \amp, { 
+	e.masterSlider.valueAction = [-inf,6,\db].asSpec.unmap( s.volume.volume ) 
+});
+s.volume.volume = s.volume.volume;
+
+
 )
