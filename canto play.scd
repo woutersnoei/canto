@@ -128,8 +128,13 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 ~canto.instruments[10] = "canto_note2";
 
 ~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1|
-	Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
-		damp: damp, sharpness: sharpness, amps: amps ? (1!5) ] );
+	if(  evt.instruments[ track ].asSymbol === 'canto_note' ) {
+		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
+			damp: damp, sharpness: sharpness, amps: amps ? (1!5) ] );
+	} {
+		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
+			damp: damp, sharpness: sharpness ] );
+	};
 };
 
 ~canto.amps = { { { Pbrown(0.0,1.0,0.2).linexp(0,1,0.001,1).asStream }!5 }!5 }!13;
