@@ -1,10 +1,10 @@
 NanoKONTROL();
 
-~canto.amp = 0.1!14;
+~canto.amp = 0.0!14;
 
 ~canto.sharpness = 8!14;
 
-([ 2, 3, 4, 5, 6, 7, 8, 9, 10]+1).do({ |item, i|
+([ 2, 3, 4, 5, 6, 7, 8, 9]+1).do({ |item, i|
 	NanoKONTROL.sliders[0][i].action_({ |sl| 
 		~canto.amp[item] = \amp.asSpec.map(sl.value) * 0.1;
 	});
@@ -13,6 +13,28 @@ NanoKONTROL();
 	});
 	
 });
+
+// verb on slider 9
+NanoKONTROL.sliders[0][8].action_({ |sl| 
+	q.verb.views.amp.valueAction = sl.value;
+});	
+
+NanoKONTROL.buttons[0][8].action = { |bt| 
+	switch( bt.value.asInt,
+		1, { 
+			 q.verb.views.power.valueAction = 1;
+		}
+	);
+};
+
+NanoKONTROL.buttons[0][17].action = { |bt| 
+	switch( bt.value.asInt,
+		1, { 
+			 q.verb.views.power.valueAction = 0;
+		}
+	);
+};
+
 
 NanoKONTROL.buttons[0][19].action = { |bt| 
 	switch( bt.value.asInt,
