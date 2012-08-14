@@ -160,12 +160,15 @@ q.verb.views[ \dur ] = SmoothNumberBox( q.verb.w, 40@16 ).value_( q.verb.dur ? 1
 	.clipLo_( 0.1 ).clipHi_(5).scroll_step_(0.1).step_(0.1).font_( q.verb.font )
 	.action_({ |nb| q.verb.dur = nb.value; });
 	
-	
+/*
 if( e.notNil )
 	{
 		e.coupleSlider( 7, { |sl| q.verb.views.amp.valueAction = sl.value }, "verb" );
 		e.actions.button.rec[7] = { |bt|  q.verb.views.power.valueAction = bt.value.asInt };		e.sliders[7].valueAction = q.verb.amp;
 		e.buttons.rec[ 7].valueAction = 0;		
 	};
+*/
+
+// now on NanoKONTROL fader 9
 
 )
