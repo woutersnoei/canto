@@ -41,6 +41,7 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 	});
 	
 	delays = PitchShift.ar( delays.sum, 0.2, pshift.midiratio, pdisp.midiratio-1, tvar );
+	delays = RemoveBadValues.ar( delays );
 	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * delays * amp );
 }).load(s);
 
@@ -86,6 +87,7 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	});
 	
 	delays = PitchShift.ar( delays.sum, 0.2, pshift.midiratio, pdisp.midiratio-1, tvar );
+	delays = RemoveBadValues.ar( delays );
 	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * delays * amp );
 }).load(s);
 

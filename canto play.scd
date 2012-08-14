@@ -59,6 +59,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	sig = CombC.ar( sig, 1/100, 1/LFDNoise3.kr(0.1).exprange(100,1000), 0.01 );
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
+	sig = RemoveBadValues.ar(sig);
 	OffsetOut.ar( 0, sig * env * amp );
 }).load(s);
 );
@@ -90,6 +91,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
+	sig = RemoveBadValues.ar(sig);
 	OffsetOut.ar( 0, sig * env * amp * 1 );
 }).load(s);
 );
@@ -127,6 +129,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	sig = BLowPass.ar( sig, (1100 * sharpness).clip(20,20000), 0.5 );
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain, 0.01]).kr(2);
+	sig = RemoveBadValues.ar(sig);
 	OffsetOut.ar( 0, sig * env * amp );
 }).load(s);
 );

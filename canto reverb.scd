@@ -29,6 +29,9 @@ SynthDef( "ws_verb%".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, ou
 	var input, sig, env;
 	env = Env([0,1,1,0,0], [0.1,0,0.1, BufDur.ir( bufs[0] ) + preDelay ], \lin, 2 ).kr(2, gate );
 	input = In.ar( 0 + (FirstPrivateBus.ir * private), bufs.size );
+	//CheckBadValues.ar( input );
+	//input = input + WhiteNoise.ar(1.0e-9);
+	input = RemoveBadValues.ar(input);
 	input = input + (input.sum * leak ) * env * amp ;
 	input = BHiShelf.ar( input, hishelfFreq, 1, hishelf );
 	input = BLowShelf.ar( input, lowshelfFreq, 1, lowshelf );
