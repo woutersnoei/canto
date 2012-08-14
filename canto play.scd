@@ -67,15 +67,25 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0|
 	var sig, envs, env, n=5;
 	var amps;
-	sig = Pulse.ar( (freq * 0.5) + [-0.5,0.5], LFDNoise1.kr(0.1.dup).range(0,1) ).sum;
+	sig = Pulse.ar( (freq * 0.5) + [-0.5,0.5], 
+		LFDNoise1.kr(0.25.dup).range(0.01,0.99) 
+		//TRand.kr(0.dup,1,In.kr(1) )
+	).sum;
 	sig = sig + GrayNoise.ar(0.1);
+	
 	//sig = sig ring1: SinOsc.ar( LFDNoise1.kr( 20 ).exprange(1000,6000), 0, 0.75);
-	//freq = TRand.kr(0.25,1.75,In.kr(1) ).lag(0.01) * freq;
+	//freq = TExpRand.kr(0.25,1,In.kr(1) ).lag(0.05) * freq;
+	
+	//freq = freq * Trig1.kr( In.kr(1), 0.02 ).lag(0,0.5).linexp(0,1,0.4,1);
+	
+	//freq = LFDNoise3.kr(0.05.dup(5))
+	
 	sig = BLowPass.ar( sig, (
 		freq.blend( LFDNoise3.kr(0.1).exprange( 40,100 ), 0.1) * sharpness 
 			//SinOsc.kr( mfreq, 0, mamt )
 		)
 		.clip(20,20000), 0.125 );
+		
 	//sig = BHiPass.ar( sig, 1000 );
 	sig = RoundPan.ar(2, sig, Rand(-0.25,0.25) + pan);
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
