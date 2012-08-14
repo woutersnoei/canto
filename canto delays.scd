@@ -303,8 +303,8 @@ RoundView.useWithSkin( (font: Font( "Helvetica", 9 ) ),
 		  'pshift', [-12,12,\lin,1,0].asSpec,
 		  'pdisp', [0,12,\lin,0.1,0].asSpec,
 		  'tvar', [0, 0.1, \lin, 0 ].asSpec,
-		  'modAmt', [0, 0.1, \lin, 0,0 ].asSpec,
-		  'modSpeed', [1,10,\lin,1,5].asSpec
+		  'modAmt', [0, 0.001, \lin, 0,0 ].asSpec,
+		  'modSpeed', [1,1000,\exp,1,5].asSpec
 		 ].pairsDo({ |key, spec|
 			 var sl;
 			 sl = EZSmoothSlider(  ~canto.delayWindow, 250@13, key, spec, 
