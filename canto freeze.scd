@@ -10,7 +10,7 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 		var t_trig, input, sig, peak, mag, chain1, chain2, output;
 		var a,b,c, fftSize = 2048;
 		var env, disp;
-		var msamp;
+		var msamp, pan = 1;
 		
 		amp = amp.lag(3);
 		
@@ -83,6 +83,14 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 			+ PitchShift.ar(output, 0.17, 2, 0.001, 0.17, 0.25 + mixShift );
 		
 		output = ((Trig1.kr(In.kr(1), cutdur) * cutup) + (1-cutup)) * output;
+		
+		pan = LFSaw.kr( LFDNoise3.kr(0.05) * 0.05 );
+	
+		output = output.collect({ |sig, i|
+			RoundPan.ar( ~canto.numChan ? 4, sig, [-0.25,0.25][i] + pan );
+		}).sum;
+		
+		output = RemoveBadValues.ar(output);
 		
 		Out.ar(out, output * amp * 0.5 * env );
 	}).store;

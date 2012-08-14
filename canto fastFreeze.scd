@@ -18,7 +18,7 @@
 ~canto.fastFreeze.res = (0.5.sqrt)!5;
 ~canto.fastFreeze.lag = 0.05;
 
-~canto.fastFreeze.pan = 0;
+~canto.fastFreeze.pan = 1;
 
 ~canto.fastFreeze.setting = 0;
 
@@ -195,7 +195,7 @@ SynthDef( "canto_fastFreeze", { |amp = 0.1, active = 1, spd = 5, modrange = 0, g
 		rhpf = #[20,20,20,20,20],
 		res = #[1.414,1.414,1.414,1.414,1.414],
 		lag = 0.05,
-		pan = 0
+		pan = 1
 	|
 	var fft, sig, buf1, buf2;
 	var bufsig, lasbufsig, phasor;
@@ -239,9 +239,10 @@ SynthDef( "canto_fastFreeze", { |amp = 0.1, active = 1, spd = 5, modrange = 0, g
 	
 	sig = BHiPass.ar( sig * Line.kr(-1,1,2048/SampleRate.ir).max(0), rhpf, res );
 	sig = BLowPass.ar( sig, rlpf, res );
+	pan = LFDNoise3.kr(0.05).range(pan.neg, pan);
 	
 	sig = sig.collect({ |sig, i|
-		RoundPan.ar( 4, sig, [-0.25,0.25][i] + pan );
+		RoundPan.ar( ~canto.numChan ? 4, sig, [-0.25,0.25][i] + pan );
 	}).sum;
 	
 	sig = RemoveBadValues.ar(sig);
@@ -318,7 +319,7 @@ RoundView.useWithSkin( ( font: Font( "Helvetica", 9 ) ),
 				
 		[ 
 		  \amp, \amp.asSpec,
-		  \pan, [-1,1,\lin,0,0].asSpec,
+		  \pan, [0.25,1,\lin,0,0].asSpec,
 		  \leak, [0,1, 8.0,0,0].asSpec,
 		  \spd, [1,20,\exp].asSpec,
 		  \modrange, [0,1].asSpec,

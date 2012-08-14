@@ -57,7 +57,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	sig = sig * AmpComp.kr( freq * 2);
 	sig = sig + LPF.ar( Impulse.ar(0, 0.5), 1200 );
 	sig = CombC.ar( sig, 1/100, 1/LFDNoise3.kr(0.1).exprange(100,1000), 0.01 );
-	sig = RoundPan.ar(2, sig, Rand(-0.25,0.25) + pan);
+	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
 	OffsetOut.ar( 0, sig * env * amp );
 }).load(s);
@@ -87,7 +87,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 		.clip(20,20000), 0.125 );
 		
 	//sig = BHiPass.ar( sig, 1000 );
-	sig = RoundPan.ar(2, sig, Rand(-0.25,0.25) + pan);
+	sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
 	OffsetOut.ar( 0, sig * env * amp * 1 );
@@ -104,8 +104,8 @@ SynthDef( "canto_note3", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	noise = OnePole.ar(noise, 0.95 );
 	sig = CombL.ar( noise, 1/50, 1/freq, 0.75 );
 	//sig = Pulse.ar( freq * 0.5, LFDNoise1.kr(0.25).range(0,1) );
-	sig = BLowPass.ar( sig, (freq * sharpness * 0.5).clip(20,20000), 0.125 );
-	sig = RoundPan.ar(2, sig, Rand(-0.125,0.125) + pan);
+	sig = BLowPass.ar( sig, (freq * (33 - sharpness)).clip(20,20000), 0.125 );
+	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain, 0.01]).kr(2);
 	OffsetOut.ar( 0, sig * env * amp );
 }).load(s);
@@ -125,7 +125,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	//sig = CombL.ar( noise, 1/50, 1/freq, 0.5 );
 	//sig = Pulse.ar( freq * 0.5, LFDNoise1.kr(0.25).range(0,1) );
 	sig = BLowPass.ar( sig, (1100 * sharpness).clip(20,20000), 0.5 );
-	sig = RoundPan.ar(2, sig, Rand(-0.125,0.125) + pan);
+	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain, 0.01]).kr(2);
 	OffsetOut.ar( 0, sig * env * amp );
 }).load(s);
