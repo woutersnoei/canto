@@ -23,13 +23,15 @@ q.verb.offset = 22; // eucon slider
 
 (
 SynthDef( "ws_verb%".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, out = 0, 
-		fftsize = 2048, private = 0, gate = 1, hishelf = 0, hishelfFreq = 1200, leak = 0.05|
+		fftsize = 2048, private = 0, gate = 1, 
+		hishelf = 1, hishelfFreq = 3000, lowshelf = -3, lowshelfFreq = 400, leak = 0.05|
 	var bufs = \bufs.ir( 0!q.verb.n );
 	var input, sig, env;
 	env = Env([0,1,1,0,0], [0.1,0,0.1, BufDur.ir( bufs[0] ) + preDelay ], \lin, 2 ).kr(2, gate );
 	input = In.ar( 0 + (FirstPrivateBus.ir * private), bufs.size );
 	input = input + (input.sum * leak ) * env * amp ;
 	input = BHiShelf.ar( input, hishelfFreq, 1, hishelf );
+	input = BLowShelf.ar( input, lowshelfFreq, 1, lowshelf );
 	input = DelayC.ar(input, 0.25, preDelay );
 	sig = bufs.collect({ |sp, i| 
 		PartConv.ar(input[i], fftsize, sp, 0.5); 
