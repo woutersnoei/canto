@@ -102,7 +102,7 @@ SynthDef( "canto_note3", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	noise = GrayNoise.ar(0.5) * Env.perc( 0.01, sustain * 0.1 ).kr;
 	noise = BLowCut.ar( noise, freq, 4);
 	noise = OnePole.ar(noise, 0.95 );
-	sig = CombL.ar( noise, 1/50, 1/freq, 0.5 );
+	sig = CombL.ar( noise, 1/50, 1/freq, 0.75 );
 	//sig = Pulse.ar( freq * 0.5, LFDNoise1.kr(0.25).range(0,1) );
 	sig = BLowPass.ar( sig, (freq * sharpness * 0.5).clip(20,20000), 0.125 );
 	sig = RoundPan.ar(2, sig, Rand(-0.125,0.125) + pan);
