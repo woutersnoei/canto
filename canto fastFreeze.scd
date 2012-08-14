@@ -73,22 +73,26 @@
 (
 ~canto.fastFreeze.iconnect = { |evt, index = 0|
 	
+	var spdspec;
+	spdspec = [1,20,\exp].asSpec;
+	
 	e.actions.slider[index] = { |sl|
 		evt.amp = \amp.asSpec.map( sl.value );
 	};
 	e.actions.knob[index] = { |sl|
 		evt.modrange = sl.value;
+		evt.spd = spdspec.map( sl.value );
 	};
 	e.actions.slider[index+1] = { |sl|
 		var lpf, hpf, width;
-		width = e.knobs[index+1].value / 2;
+		width = (1-e.knobs[index+1].value) / 2;
 		#hpf, lpf = sl.value.linlin( 0, 1,  0+width,   1-width) + [width.neg, width];
 		evt.lpf = \freq.asSpec.map(lpf);
 		evt.hpf = \freq.asSpec.map(hpf);
 	};
 	e.actions.knob[index+1] = { |sl|
 		var lpf, hpf, width;
-		width = sl.value / 2;
+		width = (1-sl.value) / 2;
 		#hpf, lpf = e.sliders[index+1].value
 			.linlin( 0, 1, 0 + width,  1 - width) + [width.neg, width];
 		evt.lpf = \freq.asSpec.map(lpf);
@@ -154,7 +158,7 @@
 			center = (hpf + width).linlin(0+width,1-width,0,1);
 			e.active = false;
 			e.sliders[index+1].valueAction = center;
-			e.knobs[index+1].valueAction = width*2;
+			e.knobs[index+1].valueAction = 1-(width*2);
 			e.active = true;
 		})
 		.put( \lpf, {
@@ -165,7 +169,7 @@
 			center = (hpf + width).linlin(0+width,1-width,0,1);
 			e.active = false;
 			e.sliders[index+1].valueAction = center;
-			e.knobs[index+1].valueAction = width*2;
+			e.knobs[index+1].valueAction = 1-(width*2);
 			e.active = true;
 		});
 		
@@ -180,8 +184,8 @@
 ~canto.fastFreeze2.res = (0.5.sqrt)!5;
 
 if( e.notNil ) { 
-	~canto.fastFreeze.iconnect( 2 ); 
-	~canto.fastFreeze2.iconnect( 4 ); 
+	~canto.fastFreeze.iconnect( 3 ); 
+	//~canto.fastFreeze2.iconnect( 4 ); 
 };
 
 (
