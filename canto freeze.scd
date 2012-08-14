@@ -22,16 +22,17 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 		//input = GrayNoise.ar( 1.dup );
 		input = Splay.ar( 
 			LFPulse.kr( 
-				SinOsc.kr({0.01 rrand: 0.1}!10, { 2pi.rand }!10).exprange(2,20), 0, 0.1 )
-				.linlin(0,1,1-modAmt,1+modAmt)
+				SinOsc.kr(({0.01 rrand: 0.1}!10), { 2pi.rand }!10).exprange(2,20), 0, 0.1 )
+					.linlin(0,1,1-modAmt,1+modAmt)
 				* BBandPass.ar( 
-						GrayNoise.ar((0.1 * (1-mixImp)).dup(10)) + 
+					GrayNoise.ar((0.1 * (1-mixImp)).dup(10)) + 
 						SinOsc.ar( 
-							SinOsc.kr( ({ 0.5 exprand: 2 }!10) * impSpeed).exprange(20,20000),
-							mul: mixImp * 0.1
+							SinOsc.kr( ({ 0.5 exprand: 2}!10) * impSpeed).exprange(20,20000),
+							mul: mixImp * 0.2
 						), 
-					SinOsc.kr({0.01 rrand: 0.1}!10, { 2pi.rand }!10).exprange(100,10000) )
-				);
+					SinOsc.kr(({0.01 rrand: 0.1}!10), { 2pi.rand }!10).exprange(100,10000)
+				)
+			);
 		
 		/*
 			* Decay.ar( Dust.ar( LFNoise2.kr(0.25.dup).exprange(0.1,5) * 500.dup, 1 ), 
