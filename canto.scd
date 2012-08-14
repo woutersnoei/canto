@@ -22,6 +22,7 @@
 	"delays",
 	"freeze",
 	"fastFreeze",
+	"bass drum",
 	"nanokontrol",
 ].collect({ |item| ~canto.path +/+ "canto" + item ++ ".scd" });
 
