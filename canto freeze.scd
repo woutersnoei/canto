@@ -38,19 +38,19 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 					0.005 ).clip(0,1);
 		*/
 					
-		input = BLowPass.ar( input, lpf.clip(20,22000) );
-		input = BHiPass.ar( input, hpf.clip(20,22000) );
+		input = BLowPass.ar( input, lpf.clip(20,20000) );
+		input = BHiPass.ar( input, hpf.clip(20,20000) );
 		
 		//t_clear = Dust.kr( 0.1 ) + t_clear;
 		
-		sig = LPF.ar( HPF.ar( PrivateIn.ar( in ), inHPF.lag(0.5).clip(20,22000) ), inLPF.lag(0.5).clip(20,22000) );
+		sig = LPF.ar( HPF.ar( PrivateIn.ar( in ), inHPF.lag(0.5).clip(20,20000) ), inLPF.lag(0.5).clip(20,20000) );
 		
 		t_trig = Impulse.kr( spd ); // update speed
 	
 		chain1 = FFT( a, input);
 		chain2 = FFT( b, sig );
 		
-		#peak, mag = FFTPeak.kr( chain2, 100, 22000 );
+		#peak, mag = FFTPeak.kr( chain2, 100, 20000 );
 		
 		peak = ((peak / 22050) * (fftSize/2)).floor * 2;
 				
