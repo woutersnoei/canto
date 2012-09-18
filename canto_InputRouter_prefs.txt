@@ -1,0 +1,3 @@
+( 'inputLabels': [ "AudioIn 1", "AudioIn 2", "AudioIn 3", "AudioIn 4", "AudioIn 5", "AudioIn 6", "AudioIn 7", "AudioIn 8", "AudioIn 9", "AudioIn 10", "AudioIn 11", "AudioIn 12", "AudioIn 13", "AudioIn 14", "AudioIn 15", "AudioIn 16", "AudioIn 17", "AudioIn 18", "AudioIn 19", "AudioIn 20", "AudioIn 21", "AudioIn 22", "AudioIn 23", "AudioIn 24", "AudioIn 25", "AudioIn 26", "AudioIn 27", "AudioIn 28" ], 'settings': [ [ 6 ], [ 7 ] ], 'inputLevels': [ [ 0 ], [ 0 ] ], 'compressionSettings': [ [ [ -12, 0, 0.05 ] ], [ [ -12, 0, 0.05 ] ] ], 
+  'filterOrder': 2, 'compressionRelease': 0.25, 'useCompression': true, 'filterSettings': [ [ [ 1, 150.0, 0, 22050 ] ], [ [ 1, 150, 0, 22050 ] ] ], 'useFilters': true, 
+  'compressionKnee': 10 )
