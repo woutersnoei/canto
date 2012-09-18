@@ -12,7 +12,7 @@
 (
 ~canto.midiOut = MIDIOut(0, 
 	MIDIClient.destinations.detect({ |item| 
-		item.device.find( "Babyface" ).notNil 
+		item.device.find( "face" ).notNil 
 	}) !? _.uid ? 0
 ).latency_(0.1);
 );
