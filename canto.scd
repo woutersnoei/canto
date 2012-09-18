@@ -7,7 +7,7 @@
 
 ~canto = ~canto ? EM();
 
-~canto.latency = (256 + 64)/44100;
+~canto.latency = (64 + 64)/44100;
 
 ~canto.path = thisProcess.nowExecutingPath.dirname;
 
