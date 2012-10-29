@@ -34,9 +34,11 @@ TempoClock.tempo = 57 / 60;
 };
 
 (
-SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0|
+SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpness = 2, pan = 0, 
+	dev = 0.3, mod = 0.25|
 	var sig, envs, env, n=5;
-	var amps;
+	var amps, freqs, modfreq;
+	dev = (dev / 2).midiratio - 1;
 	envs = n.collect({ |i|
 		Env.perc(ExpRand(
 			sharpness.linlin(16,32,0.025,0.005).clip(0.005,0.025,),
@@ -44,10 +46,12 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	});
 	amps = \amps.kr( 1.dup(n) );
 	//amps = ExpRand(0.005.dup(n),1);
-	amps = (1/((1..n) ** sharpness)) * amps;
+	amps = (1/((1..n) ** sharpness.fold(1,16.5))) * amps;
 	amps = (amps * n * envs) / (amps.sum);
 	
-	sig = SinOsc.ar( freq * (1..n) * ExpRand((1-dev).dup(n),1/(1-dev)), 
+	freqs = freq * (1..n) * ExpRand((1-dev).dup(n),1/(1-dev));
+	
+	sig = SinOsc.ar( freqs, 
 			//Rand(0.dup(n),2pi), 
 		0,
 		amps
@@ -58,7 +62,10 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	sig = sig.sum / n.sqrt;
 	sig = sig * AmpComp.kr( freq * 2);
 	sig = sig + LPF.ar( Impulse.ar(0, 0.5), 1200 );
-	sig = CombC.ar( sig, 1/100, 1/LFDNoise3.kr(0.1).exprange(100,1000), 0.01 );
+	modfreq = LFDNoise3.kr(0.1 + (mod * 2)).exprange(100,1000);
+	sig = CombC.ar( sig, 1/100, 1/modfreq, 
+		0.01 + (mod * 0.03) );
+	sig = BPeakEQ.ar( sig, 1000, 1, mod * -3 );
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
 	sig = RemoveBadValues.ar(sig);
@@ -67,11 +74,12 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 );
 
 (
-SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0|
+SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0, mod = 0.25|
 	var sig, envs, env, n=5;
-	var amps;
-	sig = Pulse.ar( (freq * 0.5) + [-0.5,0.5], 
-		LFDNoise1.kr(0.25.dup).range(0.01,0.99) 
+	var amps, cutenv;
+	mod = mod * 0.25;
+	sig = Pulse.ar( (freq * 0.5) + ([-0.5,0.5]), 
+		LFDNoise1.kr(0.25.dup).range(0.01,0.99)
 		//TRand.kr(0.dup,1,In.kr(1) )
 	).sum;
 	sig = sig + GrayNoise.ar(0.1);
@@ -83,13 +91,22 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	
 	//freq = LFDNoise3.kr(0.05.dup(5))
 	
+	cutenv = Line.kr( sharpness.linlin(18,32,1,32), sharpness.linlin(18,32,1,8), sustain );
+	
 	sig = BLowPass.ar( sig, (
-		freq.blend( LFDNoise3.kr(0.1).exprange( 40,100 ), 0.1) * sharpness 
+		freq.blend( 
+			LFDNoise3.kr(0.1).exprange( 40,100 ), 0.1) 
+				* sharpness.linlin(1,15,32,1)
+				* cutenv
+				* SinOsc.kr( 1/sustain, 0.5pi, mod, 1 );
 			//SinOsc.kr( mfreq, 0, mamt )
 		)
 		.clip(20,20000), 0.125 );
-		
-	//sig = BHiPass.ar( sig, 1000 );
+	//sig = (sig / 4).softclip * 4;
+	
+	sig = BLowCut.ar( sig, (freq * (cutenv / 2)).clip(20,20000), 3 );
+	sig = sig * Line.kr( 1, sharpness.linlin(17,32,1,0.1), sustain );
+
 	sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
@@ -136,31 +153,52 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 }).load(s);
 );
 
-~canto.instruments = "canto_note"!14;
+~canto.defNames = [ 'canto_note2', 'canto_note', 'canto_hihat' ];
 
-~canto.instruments[4] = "canto_hihat";
-//~canto.instruments[7] = "canto_random";
+~canto.instruments = 'canto_note'!14;
 
-~canto.instruments[10] = "canto_note2";
+~canto.instruments[4] = 'canto_hihat';
+~canto.instruments[10] = 'canto_note2';
 
-~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1|
+~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0|
 	if(  evt.instruments[ track ].asSymbol === 'canto_note' ) {
 		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
-			damp: damp, sharpness: sharpness, amps: amps ? (1!5) ] );
+			damp: damp, sharpness: sharpness, mod: mod, amps: amps ? (1!5) ] );
 	} {
 		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
-			damp: damp, sharpness: sharpness ] );
+			damp: damp, sharpness: sharpness, mod: mod ] );
 	};
 };
 
-~canto.amps = { { { Pbrown(0.0,1.0,0.2).linexp(0,1,0.001,1).asStream }!5 }!5 }!13;
+~canto.setSlowChange = { |evt|
+	evt.amps = { ({ Pbrown(0.0,1.0,0.1).linexp(0,1,-80.dbamp,1).asStream }!5) !5 }!13;
+	evt.damp = { Pbrown(0,1,0.1).linexp(0,1,2,16).asStream ! 5 }!13;
+};
 
-~canto.amps = { ({ Pbrown(0.0,1.0,0.1).linexp(0,1,-80.dbamp,1).asStream }!5) !5 }!13;
+~canto.setFastChange = { |evt|
+	evt.amps = { { { Pbrown(0.0,1.0,0.15).linexp(0,1,-80.dbamp,1).asStream }!5 }!5 }!13;
+	evt.damp = { { PintL( Pwhite(0.0,1,inf), 40 ).linexp(0,1,2,16).asStream } ! 5 }!13;
+};
+
 
 ~canto.amp = { (PintC( Pwhite(0,1), 0.01 ).linexp(0,1,-15.dbamp,1) * 0.1).asStream }!13;
-~canto.pan = { Pbrown(-1.0,1.0,0.1).asStream }!13;
-~canto.damp = { Pbrown(0,1,0.05).linexp(0,1,2,16).asStream }!13;
 ~canto.sharpness = { Pbrown(0,1,0.05).linexp(0,1,3,8).asStream }!13;
+
+~canto.setSlowChange;
+
+/*
+~canto.setFastChange;
+~canto.amps = { { { Pbrown(0.0,1.0,0.2).linexp(0,1,-80.dbamp,1).asStream }!5 }!5 }!13;
+~canto.amps = { ({ Pbrown(0.0,1.0,0.1).linexp(0,1,-80.dbamp,1).asStream }!5) !5 }!13;
+~canto.damp = { Pbrown(0,1,0.1).linexp(0,1,2,16).asStream ! 5 }!13;
+~canto.damp = { { PintL( Pwhite(0.0,1,inf), 20 ).linexp(0,1,2,16).asStream } ! 5 }!13;
+~canto.damp = { { Pbrown(0,1,0.1).linexp(0,1,2,16).asStream } ! 5 }!13;
+~canto.pan = { { Pbrown(-1.0,1.0,0.1).asStream } ! 5 }!13;
+*/
+
+~canto.pan = { Pbrown(-1.0,1.0,0.1).asStream ! 5 }!13;
+
+~canto.mod = 0.0!13;
 
 
 ~canto.playBar = { |evt, track = 4, bar = 0, cell = 2, variant = 0|
@@ -178,10 +216,11 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 			s.makeBundle( 0.1 + (0.00001.rand), { 
 				evt.playNote( track, note[4], note[6] / TempoClock.tempo, 
 					evt.amps[ track ][(pos * 5).round(1)].collect(_.value),
-					evt.pan[ track ].value,
-					evt.damp[ track ].value,
+					evt.pan[ track ][(pos * 5).round(1)].collect(_.value),
+					evt.damp[ track ][(pos * 5).round(1)].collect(_.value),
 					evt.sharpness[ track ].value,
 					evt.amp[ track ].value,
+					evt.mod[ track ].value
 				);
 			});
 			time = pos;
