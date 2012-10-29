@@ -5,6 +5,8 @@
 
 ~canto.cutbus = Bus( \control, 1, 1 );
 
+TempoClock.tempo = 57 / 60;
+
 ~canto.getCell = { |evt, cell = 1|
 	if( cell.isKindOf( Dictionary ).not ) {
 		cell = cell.asSymbol;
