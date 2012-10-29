@@ -10,7 +10,7 @@ SynthDef( "bassdrum", { |amp = 0.25, freq = 40, pulse = 0.1, attackFreq = 100, d
 			LFDNoise3.kr(0.1).exprange(-0.1.midiratio, 0.1.midiratio),
 		-1);
 	sig = sig * Env([1,0], [sustain], -4).kr(2);
-	sig = RoundPan.ar( 4, sig * 4, pan + Rand(-0.1,0.1)) * amp;
+	sig = RoundPan.ar( 4, sig, pan + Rand(-0.1,0.1)) * amp;
 	CheckBadValues.ar( sig, 100, 2 );
 	sig = RemoveBadValues.ar( sig );
 	OffsetOut.ar(0, sig )
