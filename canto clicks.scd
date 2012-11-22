@@ -56,7 +56,7 @@
 ~canto.clicks.iconnect = { |evt, index = 0|
 	
 	var combspec;
-	combspec = [0.00125,0.2,\exp].asSpec;
+	combspec = [0.00125,0.4,\exp].asSpec;
 	
 	e.actions.slider[index] = { |sl|
 		evt.amp = \amp.asSpec.map( sl.value );
@@ -116,7 +116,6 @@ SynthDef( "canto_clicks", { |modSpeed = 0.1, pan = 0.25, gate = 1, amp = 0.1,
 	var spds, trg, env;
 	var sig;
 	var notes;
-	var freq = [ minFreq, maxFreq ];
 	
 	notes = \notes.kr( { 64.rand }!8 ).midicps;
 	
@@ -197,10 +196,10 @@ RoundView.useWithSkin( ( font: Font( "Helvetica", 9 ) ),
 		 
 		[ 
 		  \amp, \amp.asSpec,
-		  \res, [0.00125,0.2,\exp].asSpec,
-		  \modSpeed, [0.1,5,\exp,0,0.1].asSpec,
+		  \res, [0.00125,0.4,\exp].asSpec,
+		  \modSpeed, [0.1,20,\exp,0,0.1].asSpec,
 		  \pan, [0.25,1].asSpec,
-		  \spd, [2,10,\lin,1,2].asSpec
+		  \spd, [2,100,\exp,1,2].asSpec
 		 ].pairsDo({ |key, spec|
 			 var sl;
 			 sl = EZSmoothSlider( ~canto.clicksWindow, 250@13, key, spec, 
