@@ -18,10 +18,11 @@
 	"icontrols",
 	"reverb",
 	"recbuf",
-	"loop",
+	//"loop",
 	"delays",
 	"freeze",
 	"fastFreeze",
+	"clicks",
 	"bass drum",
 	"nanokontrol",
 ].collect({ |item| ~canto.path +/+ "canto" + item ++ ".scd" });
