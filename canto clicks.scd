@@ -103,8 +103,12 @@ if( e.notNil ) {
 ~canto.clicksCtrl.remove;
 ~canto.clicksCtrl = SimpleController( ~canto );
 ~canto.clicksCtrl.put( \bar, { |...args|
-	~canto.clicks.notes = ~canto.getCellBar( ~canto.bar, ~canto.currentIndex )
-		.flop[4].as(Set).as(Array).sort.wrapAt((..7))
+	var notes;
+	notes = ~canto.getCellBar( ~canto.bar, ~canto.currentIndex );
+	if( notes.notNil ) {
+		~canto.clicks.notes = ~canto.getCellBar( ~canto.bar, ~canto.currentIndex )
+			.flop[4].as(Set).as(Array).sort.wrapAt((..7))
+	};
 });
 
 
