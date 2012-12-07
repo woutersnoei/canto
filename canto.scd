@@ -11,6 +11,8 @@
 
 ~canto.path = thisProcess.nowExecutingPath.dirname;
 
+~canto.numChan = 2;
+
 ~canto.fileNames = [
 	"midi import",
 	"play",
