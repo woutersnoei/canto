@@ -10,7 +10,7 @@
 (
 SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latency = 0.02,
 		modSpeed = 5, modAmt = 0, pshift = 0, pdisp = 0, tvar = 0,
-		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000]|
+		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000], out = 0|
 	var delays, input, index;
 	var trig;
 	var times;
@@ -42,14 +42,15 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 	
 	delays = PitchShift.ar( delays.sum, 0.2, pshift.midiratio, pdisp.midiratio-1, tvar );
 	delays = RemoveBadValues.ar( delays );
-	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * delays * amp );
+	delays = Splay.ar( delays );
+	Out.ar(out, Env.cutoff(0.1).kr(2,gate) * delays * amp );
 }).load(s);
 
 
 
 SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1, latency = 0.02,
 		modSpeed = 5, modAmt = 0, pshift = 0, pdisp = 0, tvar = 0,
-		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000]|
+		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000], out = 0|
 	var delays, input, index;
 	var trig;
 	var times;
@@ -88,7 +89,8 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	
 	delays = PitchShift.ar( delays.sum, 0.2, pshift.midiratio, pdisp.midiratio-1, tvar );
 	delays = RemoveBadValues.ar( delays );
-	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * delays * amp );
+	delays = Splay.ar( delays );
+	Out.ar(out, Env.cutoff(0.1).kr(2,gate) * delays * amp );
 }).load(s);
 
 );
