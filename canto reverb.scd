@@ -12,7 +12,7 @@ q.verb = q.verb ? EM();
 q.verb.font = Font( Font.defaultSansFace, 10 );
 
 q.verb.active = 0;
-q.verb.n = 4; // number of channels
+q.verb.n = ~canto.numChan ? 4; // number of channels
 q.verb.fftsize= 2048; 
 q.verb.amp = 0.1;
 q.verb.preDelay = 0;
@@ -40,7 +40,7 @@ SynthDef( "ws_verb%".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, ou
 		PartConv.ar(input[i], fftsize, sp, 0.5); 
 	});
 	
-	Out.ar( 0, sig * 2 );
+	Out.ar( out, sig * 2 );
 }).load(s);
 );
 
@@ -58,7 +58,7 @@ SynthDef( "ws_verb%_sum".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0
 		PartConv.ar(input, fftsize, sp, 0.5); 
 	});
 	
-	Out.ar( 0, sig * amp * 2 );
+	Out.ar( out, sig * amp * 2 );
 }).load(s);
 );
 
@@ -105,6 +105,7 @@ q.verb.start = { |evt|  // doesn't check if already started !!
 	evt.active = 1;
 	evt.sn = Synth( "ws_verb%".format( evt.n ), [
 		 		\amp, evt.amp, 
+		 		\out, evt.out,
  		 		\preDelay, evt.preDelay,
  		 		\bufs, evt.irspectrum,
  		 		\fftsize, evt.fftsize,

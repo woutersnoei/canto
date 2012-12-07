@@ -154,7 +154,7 @@ SynthDef( "canto_clicks", { |modSpeed = 0.1, pan = 0.25, gate = 1, amp = 0.1,
 			4 
 		);
 		
-		RoundPan.ar( 4, trig * 0.25, LFDNoise3.kr(modSpeed) * pan);
+		RoundPan.ar( ~canto.numChan ? 4, trig * 0.25, LFDNoise3.kr(modSpeed) * pan);
 	}).sum;
 	
 	env = Env.asr(0.1,1,0.1).kr(2,gate);
