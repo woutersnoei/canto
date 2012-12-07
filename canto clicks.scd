@@ -158,7 +158,7 @@ SynthDef( "canto_clicks", { |modSpeed = 0.1, pan = 0.25, gate = 1, amp = 0.1,
 	}).sum;
 	
 	env = Env.asr(0.1,1,0.1).kr(2,gate);
-	Out.ar( 0, sig * env * amp.lag(0.1) );
+	Out.ar( 4, sig * env * amp.lag(0.1) );
 }).load(s);
 );
 

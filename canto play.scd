@@ -111,7 +111,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
 	sig = RemoveBadValues.ar(sig);
-	OffsetOut.ar( 0, sig * env * amp * 1 );
+	OffsetOut.ar( 2, sig * env * amp * 1 );
 }).load(s);
 );
 
@@ -149,7 +149,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain, 0.01]).kr(2);
 	sig = RemoveBadValues.ar(sig);
-	OffsetOut.ar( 0, sig * env * amp );
+	OffsetOut.ar( 4, sig * env * amp );
 }).load(s);
 );
 

@@ -12,7 +12,7 @@ SynthDef( "bassdrum", { |amp = 0.25, freq = 40, pulse = 0.1, attackFreq = 100, d
 	sig = sig * Env([1,0], [sustain], -4).kr(2);
 	sig = RoundPan.ar( ~canto.numChan ? 4, sig, pan + Rand(-0.1,0.1)) * amp;
 	sig = RemoveBadValues.ar( sig );
-	OffsetOut.ar(0, sig )
+	OffsetOut.ar(6, sig )
 }).load(s);
 );
 

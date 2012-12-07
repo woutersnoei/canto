@@ -15,6 +15,7 @@ q.verb.active = 0;
 q.verb.n = ~canto.numChan ? 4; // number of channels
 q.verb.fftsize= 2048; 
 q.verb.amp = 0.1;
+q.verb.out = 14;
 q.verb.preDelay = 0;
 q.verb.dur = 1.5;
 q.verb.private = false;
