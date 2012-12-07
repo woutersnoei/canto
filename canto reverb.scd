@@ -23,13 +23,14 @@ q.verb.private = false;
 q.verb.offset = 22; // eucon slider
 
 (
-SynthDef( "ws_verb%".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, out = 0, 
+SynthDef( "ws_verb%_14in".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, out = 0, 
 		fftsize = 2048, private = 0, gate = 1, 
 		hishelf = 1, hishelfFreq = 3000, lowshelf = -3, lowshelfFreq = 400, leak = 0.05|
 	var bufs = \bufs.ir( 0!q.verb.n );
 	var input, sig, env;
 	env = Env([0,1,1,0,0], [0.1,0,0.1, BufDur.ir( bufs[0] ) + preDelay ], \lin, 2 ).kr(2, gate );
-	input = In.ar( 0 + (FirstPrivateBus.ir * private), bufs.size );
+	input = In.ar( 0 + (FirstPrivateBus.ir * private), 14 );
+	input = input.clump( bufs.size ).sum;
 	//CheckBadValues.ar( input );
 	//input = input + WhiteNoise.ar(1.0e-9);
 	input = RemoveBadValues.ar(input);
@@ -104,7 +105,7 @@ q.verb.prepare = { |evt|
 		
 q.verb.start = { |evt|  // doesn't check if already started !!
 	evt.active = 1;
-	evt.sn = Synth( "ws_verb%".format( evt.n ), [
+	evt.sn = Synth( "ws_verb%_14in".format( evt.n ), [
 		 		\amp, evt.amp, 
 		 		\out, evt.out,
  		 		\preDelay, evt.preDelay,
