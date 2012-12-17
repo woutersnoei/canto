@@ -196,7 +196,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 ~canto.pan = { { Pbrown(-1.0,1.0,0.1).asStream } ! 5 }!13;
 */
 
-~canto.pan = { Pbrown(-1.0,1.0,0.1).asStream ! 5 }!13;
+~canto.pan = { Pbrown(-2.0,2.0,0.1).wrap(-1,1).asStream ! 5 }!13;
 
 ~canto.mod = 0.0!13;
 
