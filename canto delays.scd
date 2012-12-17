@@ -10,7 +10,7 @@
 (
 SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latency = 0.02,
 		modSpeed = 5, modAmt = 0, pshift = 0, pdisp = 0, tvar = 0,
-		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000], out = 0|
+		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000], out = 10|
 	var delays, input, index;
 	var trig;
 	var times;
@@ -50,7 +50,7 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 
 SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1, latency = 0.02,
 		modSpeed = 5, modAmt = 0, pshift = 0, pdisp = 0, tvar = 0,
-		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000], out = 0|
+		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000], out = 12|
 	var delays, input, index;
 	var trig;
 	var times;
@@ -64,8 +64,8 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	);
 	
 	input = WhiteNoise.ar(1e-10);
-	input = input + In.ar( in + (private * (NumOutputBuses.ir + NumInputBuses.ir) ) + [0,2]).mean;
-	
+	input = input + In.ar( in + (private * (NumOutputBuses.ir + NumInputBuses.ir) ) + (0,2..10)
+		).mean;
 	
 	//input = input.wrapExtend( times.size );
 	
