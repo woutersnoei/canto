@@ -73,7 +73,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpn
 }).load(s);
 );
 
-(
+( // bass
 SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0, mod = 0.25|
 	var sig, envs, env, n=5;
 	var amps, cutenv;
@@ -107,11 +107,11 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	sig = BLowCut.ar( sig, (freq * (cutenv / 2)).clip(20,20000), 3 );
 	sig = sig * Line.kr( 1, sharpness.linlin(17,32,1,0.1), sustain );
 
-	sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
+	sig = RoundPan.ar( 2, sig, Rand(-0.05,0.05) + pan);
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
 	sig = RemoveBadValues.ar(sig);
-	OffsetOut.ar( 2, sig * env * amp * 1 );
+	OffsetOut.ar( 8, sig * env * amp * 1 );
 }).load(s);
 );
 

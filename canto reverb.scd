@@ -15,12 +15,38 @@ q.verb.active = 0;
 q.verb.n = ~canto.numChan ? 4; // number of channels
 q.verb.fftsize= 2048; 
 q.verb.amp = 0.1;
-q.verb.out = 14;
+q.verb.out = 16;
 q.verb.preDelay = 0;
 q.verb.dur = 1.5;
 q.verb.private = false;
 
 q.verb.offset = 22; // eucon slider
+
+(
+SynthDef( "ws_verb%_16in".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, out = 0, 
+		fftsize = 2048, private = 0, gate = 1, 
+		hishelf = 1, hishelfFreq = 3000, lowshelf = -3, lowshelfFreq = 400, leak = 0.05|
+	var bufs = \bufs.ir( 0!q.verb.n );
+	var input, sig, env;
+	env = Env([0,1,1,0,0], [0.1,0,0.1, BufDur.ir( bufs[0] ) + preDelay ], \lin, 2 ).kr(2, gate );
+	input = In.ar( 0 + (FirstPrivateBus.ir * private), 16 );
+	input = input.clump( bufs.size );
+	input[2] = (input[2][[0,1]] + input[2][[2,3]]) ++ [0,0]; // bass and bass drum are stereo
+	input = input.sum;
+	//CheckBadValues.ar( input );
+	//input = input + WhiteNoise.ar(1.0e-9);
+	input = RemoveBadValues.ar(input);
+	input = input + (input.sum * leak ) * env * amp ;
+	input = BHiShelf.ar( input, hishelfFreq, 1, hishelf );
+	input = BLowShelf.ar( input, lowshelfFreq, 1, lowshelf );
+	input = DelayC.ar(input, 0.25, preDelay );
+	sig = bufs.collect({ |sp, i| 
+		PartConv.ar(input[i], fftsize, sp, 0.5); 
+	});
+	
+	Out.ar( out, sig * 2 );
+}).load(s);
+);
 
 (
 SynthDef( "ws_verb%_14in".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, out = 0, 
@@ -45,6 +71,7 @@ SynthDef( "ws_verb%_14in".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 
 	Out.ar( out, sig * 2 );
 }).load(s);
 );
+
 
 (
 SynthDef( "ws_verb%_sum".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0, out = 0, 
@@ -105,7 +132,7 @@ q.verb.prepare = { |evt|
 		
 q.verb.start = { |evt|  // doesn't check if already started !!
 	evt.active = 1;
-	evt.sn = Synth( "ws_verb%_14in".format( evt.n ), [
+	evt.sn = Synth( "ws_verb%_16in".format( evt.n ), [
 		 		\amp, evt.amp, 
 		 		\out, evt.out,
  		 		\preDelay, evt.preDelay,

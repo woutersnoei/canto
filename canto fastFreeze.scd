@@ -247,7 +247,7 @@ SynthDef( "canto_fastFreeze", { |amp = 0.1, active = 1, spd = 5, modrange = 0, g
 	
 	sig = RemoveBadValues.ar(sig);
 	
-	Out.ar(8,sig * amp.lag(1) * Env.cutoff(2).kr(2,gate) );
+	Out.ar( 24, sig * amp.lag(1) * Env.cutoff(2).kr(2,gate) );
 }).load(s);
 );
 
