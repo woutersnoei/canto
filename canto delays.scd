@@ -225,8 +225,8 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 };
 
 if( e.notNil ) { 
-	~canto.delay.global.iconnect( 6 );
-	~canto.delay.input.iconnect( 7 );
+	~canto.delay.global.iconnect( 8 );
+	~canto.delay.input.iconnect( 9 );
  };
 
 (

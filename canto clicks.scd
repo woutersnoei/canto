@@ -96,7 +96,7 @@
 );
 
 if( e.notNil ) { 
-	~canto.clicks.iconnect( 5 ); 
+	~canto.clicks.iconnect( 7 ); 
 	//~canto.clicks2.iconnect( 4 ); 
 };
 
