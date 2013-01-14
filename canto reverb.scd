@@ -32,6 +32,7 @@ SynthDef( "ws_verb%_16in".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 
 	input = In.ar( 0 + (FirstPrivateBus.ir * private), 16 );
 	input = input.clump( bufs.size );
 	input[2] = (input[2][[0,1]] + input[2][[2,3]]) ++ [0,0]; // bass and bass drum are stereo
+	input[1] = input[1] * 0.5;
 	input = input.sum;
 	//CheckBadValues.ar( input );
 	//input = input + WhiteNoise.ar(1.0e-9);
