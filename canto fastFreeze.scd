@@ -240,14 +240,15 @@ SynthDef( "canto_fastFreeze", { |amp = 0.1, active = 1, spd = 5, modrange = 0, g
 	sig = BHiPass.ar( sig * Line.kr(-1,1,2048/SampleRate.ir).max(0), rhpf, res );
 	sig = BLowPass.ar( sig, rlpf, res );
 	pan = LFDNoise3.kr(0.05).range(pan.neg, pan);
-	
+	/*
 	sig = sig.collect({ |sig, i|
 		RoundPan.ar( ~canto.numChan ? 4, sig, [-0.25,0.25][i] + pan );
 	}).sum;
+	*/
 	
 	sig = RemoveBadValues.ar(sig);
 	
-	Out.ar( 24, sig * amp.lag(1) * Env.cutoff(2).kr(2,gate) );
+	Out.ar( 20, sig * amp.lag(1) * Env.cutoff(2).kr(2,gate) );
 }).load(s);
 );
 
