@@ -84,7 +84,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 		LFDNoise1.kr(0.25.dup(4)).range(0.01,0.99)
 		//TRand.kr(0.dup,1,In.kr(1) )
 	).sum;
-	sig = sig + GrayNoise.ar(0.1);
+	sig = sig + GrayNoise.ar(0.15);
 	
 	//sig = sig ring1: SinOsc.ar( LFDNoise1.kr( 20 ).exprange(1000,6000), 0, 0.75);
 	//freq = TExpRand.kr(0.25,1,In.kr(1) ).lag(0.05) * freq;
