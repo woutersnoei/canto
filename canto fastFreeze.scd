@@ -185,7 +185,7 @@
 
 if( e.notNil ) { 
 	~canto.fastFreeze.iconnect( 3 ); 
-	//~canto.fastFreeze2.iconnect( 4 ); 
+	~canto.fastFreeze2.iconnect( 5 ); 
 };
 
 (
