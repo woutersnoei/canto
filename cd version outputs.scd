@@ -19,7 +19,7 @@ totaal 28 outs (incl spdif)
 - delays: out 13-16 (adat 1)
 - reverb: out 17-20 (adat 1)
 - harp delays: out 21-24 (adat 2)
-- freeze: out 25-28 (adat 2)
+- freeze: out 21-24 (adat 2)
 
 
 
