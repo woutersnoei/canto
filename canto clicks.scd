@@ -12,10 +12,11 @@
 ~canto.clicks.freq = [20, 2000];
 ~canto.clicks.filter = [50,20000];
 ~canto.clicks.res = 0.05;
+~canto.clicks.div = 1;
 
 ~canto.clicks.notes = { 64.rand }!8;
 
-#[ amp, modSpeed, pan, filter, freq, res, notes ].do({ |item|
+#[ amp, modSpeed, pan, filter, freq, res, notes, div ].do({ |item|
 	~canto.clicks[ item.asSetter ] = { |evt, value|
 		if( value.notNil ) {
 			evt[ item ] = value;
@@ -116,7 +117,7 @@ if( e.notNil ) {
 ~canto.clicks.n = 4;
 
 SynthDef( "canto_clicks", { |modSpeed = 0.1, pan = 0.25, gate = 1, amp = 0.1, 
-		freq = #[20, 4000], filter = #[ 50, 20000 ], res = 0.05|
+		freq = #[20, 4000], filter = #[ 50, 20000 ], res = 0.05, div = 1|
 	var spds, trg, env;
 	var sig;
 	var notes;
@@ -132,6 +133,7 @@ SynthDef( "canto_clicks", { |modSpeed = 0.1, pan = 0.25, gate = 1, amp = 0.1,
 		var trig, env;
 		var note, noteMul, frx;
 		trig = TDuty.ar( 60/spd, trg ) - 0.001;
+		trig = PulseDivider.ar( trig, div );
 		note = Demand.ar( trig, 0, Drand( notes, inf ) );
 		noteMul = Demand.ar( trig, 0, 
 			Dwhite( 0.1,1, inf)
@@ -203,7 +205,8 @@ RoundView.useWithSkin( ( font: Font( "Helvetica", 9 ) ),
 		  \res, [0.00125,0.4,\exp].asSpec,
 		  \modSpeed, [0.1,20,\exp,0,0.1].asSpec,
 		  \pan, [0.25,1].asSpec,
-		  \spd, [2,100,\exp,1,2].asSpec
+		  \spd, [2,100,\exp,1,2].asSpec,
+		  \div, [1,16,\lin,1,1].asSpec
 		 ].pairsDo({ |key, spec|
 			 var sl;
 			 sl = EZSmoothSlider( ~canto.clicksWindow, 250@13, key, spec, 
