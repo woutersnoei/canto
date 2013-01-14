@@ -20,6 +20,7 @@
 	"recbuf",
 	//"loop",
 	"delays",
+	"revDelay",
 	"freeze",
 	"fastFreeze",
 	"clicks",
