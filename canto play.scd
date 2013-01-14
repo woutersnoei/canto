@@ -98,7 +98,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 			LFDNoise3.kr(0.1).exprange( 40,100 ), 0.1) 
 				* sharpness.linlin(1,15,32,1)
 				* cutenv
-				* SinOsc.kr( 1/sustain, 0.5pi, mod, 1 );
+				//* SinOsc.kr( 1/sustain, 0.5pi, mod, 1 );
 			//SinOsc.kr( mfreq, 0, mamt )
 		)
 		.clip(20,20000), 0.125 );
