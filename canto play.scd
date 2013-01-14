@@ -64,7 +64,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpn
 	sig = sig + LPF.ar( Impulse.ar(0, 0.5), 1200 );
 	modfreq = LFDNoise3.kr(0.1 + (mod * 2)).exprange(100,1000);
 	sig = CombC.ar( sig, 1/100, 1/modfreq, 
-		0.01 + (mod * 0.03) );
+		0.01 + (mod * 0.04) );
 	sig = BPeakEQ.ar( sig, 1000, 1, mod * -3 );
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
