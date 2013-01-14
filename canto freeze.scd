@@ -86,9 +86,13 @@ SynthDef( "canto_magpeakfreeze", { |t_clear = 0, modAmt = 0, out = 0, in=0, spd 
 		
 		pan = LFSaw.kr( LFDNoise3.kr(0.05) * 0.05 );
 	
+		/*
 		output = output.collect({ |sig, i|
 			RoundPan.ar( ~canto.numChan ? 4, sig, [-0.25,0.25][i] + pan );
 		}).sum;
+		*/
+		
+		output = (output ++ output.reverse) * PanAz.kr( 4, 1, pan, 1, 3 );
 		
 		output = RemoveBadValues.ar(output);
 		

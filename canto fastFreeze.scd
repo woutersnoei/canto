@@ -245,6 +245,8 @@ SynthDef( "canto_fastFreeze", { |amp = 0.1, active = 1, spd = 5, modrange = 0, g
 		RoundPan.ar( ~canto.numChan ? 4, sig, [-0.25,0.25][i] + pan );
 	}).sum;
 	
+	//sig = (sig ++ sig) * PanAz.kr( 4, 1, pan );
+	
 	sig = RemoveBadValues.ar(sig);
 	
 	Out.ar(0,sig * amp.lag(1) * Env.cutoff(2).kr(2,gate) );
