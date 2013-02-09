@@ -208,6 +208,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 
 ~canto.mod = 0.0!13;
 
+~canto.useNote = [true,true,true,true,true];
 
 ~canto.playBar = { |evt, track = 4, bar = 0, cell = 2, variant = 0|
 	var notes;
@@ -220,17 +221,20 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 		}).do({ |note|
 			var pos;
 			pos = note[1] - bar;
+			//pos.postln;
 			(pos-time).wait;
-			s.makeBundle( 0.1 + (0.00001.rand), { 
-				evt.playNote( track, note[4], note[6] / TempoClock.tempo, 
-					evt.amps[ track ][(pos * 5).round(1)].collect(_.value),
-					evt.pan[ track ][(pos * 5).round(1)].collect(_.value),
-					evt.damp[ track ][(pos * 5).round(1)].collect(_.value),
-					evt.sharpness[ track ].value,
-					evt.amp[ track ].value,
-					evt.mod[ track ].value
-				);
-			});
+			if( evt.useNote[(pos * 5).round(1).asInt] != false ) {
+				s.makeBundle( 0.1 + (0.00001.rand), { 
+					evt.playNote( track, note[4], note[6] / TempoClock.tempo, 
+						evt.amps[ track ][(pos * 5).round(1)].collect(_.value),
+						evt.pan[ track ][(pos * 5).round(1)].collect(_.value),
+						evt.damp[ track ][(pos * 5).round(1)].collect(_.value),
+						evt.sharpness[ track ].value,
+						evt.amp[ track ].value,
+						evt.mod[ track ].value
+					);
+				});
+			};
 			time = pos;
 		});
 	}).start;
