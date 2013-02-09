@@ -38,7 +38,7 @@ SynthDef( "canto_revDelay", { |in = 0, private = 0, amp = 0.1,
 	
 	out = RemoveBadValues.ar( out );
 	
-	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * out * amp );
+	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * out * 2 * amp );
 }).load(s);
 
 
@@ -76,7 +76,7 @@ SynthDef( "canto_revDelay_quadIn", { |in = 0, private = 0, amp = 0.1,
 	
 	out = RemoveBadValues.ar( out );
 	
-	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * out * amp );
+	Out.ar(0, Env.cutoff(0.1).kr(2,gate) * out * amp * 2);
 }).load(s);
 
 
