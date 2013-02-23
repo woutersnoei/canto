@@ -71,7 +71,7 @@ q.verb.danStowel = {|evt|
 	if(0.5.coin){0-f}{f}  }) * (-27.dbamp);
 };
 
-q.verb.prepare = { |evt|
+q.verb.prepare = { |evt, action|
 	
 		evt.irspectrum.do( _.free );
 		evt.irspectrum = nil;
@@ -97,6 +97,7 @@ q.verb.prepare = { |evt|
 			irbuffer.free; //don't need time domain data anymore, just needed spectral version
 			});
 		"prepare done".postln;
+		action.value;
 		}.fork;
 
 };
@@ -121,9 +122,6 @@ q.verb.end = { |evt|
 q.verb.cmdPeriod = { |evt| if( evt.active == 1 ) { { evt.start }.defer(0.1); } };
 	
 CmdPeriod.add( q.verb );
-
-q.verb.prepare;
-
 
 // window and views
 q.verb.w = Window( "verb", Rect(146, 365, 113, 84)).front;
@@ -164,6 +162,8 @@ StaticText( q.verb.w, 50@16 ).string_( "dur" ).align_( \right ).font_( q.verb.fo
 q.verb.views[ \dur ] = SmoothNumberBox( q.verb.w, 40@16 ).value_( q.verb.dur ? 1.3 )
 	.clipLo_( 0.1 ).clipHi_(5).scroll_step_(0.1).step_(0.1).font_( q.verb.font )
 	.action_({ |nb| q.verb.dur = nb.value; });
+	
+q.verb.prepare({ q.verb.views.power.valueAction = 1; });
 	
 /*
 if( e.notNil )
