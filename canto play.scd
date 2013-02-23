@@ -74,7 +74,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpn
 );
 
 (
-SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0, mod = 0.25|
+SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0, mod = 0.25|
 	var sig, envs, env, n=5;
 	var amps, cutenv;
 	var inclick;
@@ -136,7 +136,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 );
 
 (
-SynthDef( "canto_note3", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpness = 2, pan = 0, 
+SynthDef( "canto_noteNoise", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpness = 2, pan = 0, 
 	dev = 0.3, mod = 0.25|
 	var sig, envs, env, n=5;
 	var amps, freqs, modfreq;
@@ -222,12 +222,12 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 }).load(s);
 );
 
-~canto.defNames = [ 'canto_note2', 'canto_note3', 'canto_note', 'canto_hihat' ];
+~canto.defNames = [ 'canto_bass', 'canto_noteNoise', 'canto_note', 'canto_hihat' ];
 
 ~canto.instruments = 'canto_note'!14;
 
 ~canto.instruments[4] = 'canto_hihat';
-~canto.instruments[10] = 'canto_note2';
+~canto.instruments[10] = 'canto_bass';
 
 ~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0|
 	if(  evt.instruments[ track ].asSymbol !== 'canto_hihat' ) {
