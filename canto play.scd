@@ -124,18 +124,67 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 );
 
 (
-SynthDef( "canto_note3", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0|
+SynthDef( "canto_note3", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpness = 2, pan = 0, 
+	dev = 0.3, mod = 0.25|
 	var sig, envs, env, n=5;
-	var noise;
-	var amps;
-	noise = GrayNoise.ar(0.5) * Env.perc( 0.01, sustain * 0.1 ).kr;
-	noise = BLowCut.ar( noise, freq, 4);
-	noise = OnePole.ar(noise, 0.95 );
-	sig = CombL.ar( noise, 1/50, 1/freq, 0.75 );
-	//sig = Pulse.ar( freq * 0.5, LFDNoise1.kr(0.25).range(0,1) );
-	sig = BLowPass.ar( sig, (freq * (33 - sharpness)).clip(20,20000), 0.125 );
+	var amps, freqs, modfreq;
+	var moddev;
+	dev = (dev / 2).midiratio - 1;
+	envs = n.collect({ |i|
+		Env.perc(ExpRand(
+			sharpness.linlin(16,32,0.025,0.005).clip(0.005,0.025,),
+		0.04),1,0.99,(i+1).neg * damp).ar + 0.01;
+	});
+	amps = \amps.kr( 1.dup(n) );
+	//amps = ExpRand(0.005.dup(n),1);
+	amps = (1/((1..n) ** sharpness.fold(1,16.5))) * amps;
+	amps = (amps * n * envs) / (amps.sum);
+	
+	freqs = freq * (1..n) * ExpRand((1-dev).dup(n),1/(1-dev));
+	
+	/*
+	sig = SinOsc.ar( freqs, 
+			//Rand(0.dup(n),2pi), 
+		0,
+		amps
+		);
+	*/
+	
+	//sig = BBandPass.ar( GrayNoise.ar(1.dup(freqs.size)), freqs, 0.01, amps * 100 );
+	
+	/*
+	sig = freqs.collect({ |fr,i|
+		var sg;
+		sg = GrayNoise.ar(10);
+		sg = BLowCut.ar( sg, fr, 5 );
+		sg = BHiCut.ar( sg, fr, 5 );
+		sg
+	}) * amps;
+	*/
+	moddev = 1.01 + (mod * 0.25);
+	
+	sig = freqs.collect({ |fr,i|
+		var sg;
+		sg = SinOsc.ar( GrayNoise.ar(1).exprange( fr/moddev, fr*moddev ) );
+		sg
+	}) * amps;
+	
+		
+	//sig = BLowPass.ar( sig, freq * XLine.kr(3,1,sustain), 0.33 );
+	
+	sig = sig.sum / n.sqrt;
+	//sig = BLowCut.ar( sig, freq );
+	sig = sig * AmpComp.kr( freq * 2);
+	sig = sig + LPF.ar( Impulse.ar(0, 0.5), 1200 );
+	modfreq = LFDNoise3.kr(0.1 + (mod * 2)).exprange(100,1000);
+	
+	sig = CombC.ar( sig, 1/100, 1/modfreq, 
+		0.01 );
+	
+	sig = BPeakEQ.ar( sig, 1000, 1, mod * -3 );
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
-	env = Env([0,1,1,0], [0.01, sustain, 0.01]).kr(2);
+	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
+	sig = RemoveBadValues.ar(sig);
 	OffsetOut.ar( 0, sig * env * amp );
 }).load(s);
 );
@@ -161,7 +210,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 }).load(s);
 );
 
-~canto.defNames = [ 'canto_note2', 'canto_note', 'canto_hihat' ];
+~canto.defNames = [ 'canto_note2', 'canto_note3', 'canto_note', 'canto_hihat' ];
 
 ~canto.instruments = 'canto_note'!14;
 
