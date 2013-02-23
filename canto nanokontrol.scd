@@ -4,9 +4,17 @@ NanoKONTROL();
 
 ~canto.sharpness = 16.5!14;
 
+~canto.nanoLastChecked = thisThread.seconds!8;
+
 ([ 2, 3, 4, 5, 6, 7, 8, 9]+1).do({ |item, i|
 	NanoKONTROL.sliders[0][i].action_({ |sl| 
+		var now;
 		~canto.amp[item] = \amp.asSpec.map(sl.value) * 0.1;
+		now = thisThread.seconds;
+		if( (now - ~canto.nanoLastChecked[i]) > 1 ) {
+			"%: '%'\n".postf( i+1, ~canto.instruments[item] );
+		};
+		~canto.nanoLastChecked[i] = now;
 	});
 	NanoKONTROL.knobs[0][i].action_({ |sl| 
 		~canto.sharpness[item] = sl.value.linlin(0,1,32,1);
@@ -16,6 +24,7 @@ NanoKONTROL();
 			~canto.instruments[item] = ~canto.defNames.clipAt( 
 			 	~canto.defNames.indexOf( ~canto.instruments[item] ) + 1
 			 );
+			 "% to '%'\n".postf( i+1, ~canto.instruments[item] );
 		};
 	});
 	NanoKONTROL.buttons[0][i+9].action_({ |bt| 
@@ -23,6 +32,7 @@ NanoKONTROL();
 			~canto.instruments[item] = ~canto.defNames.clipAt( 
 			 	~canto.defNames.indexOf( ~canto.instruments[item] ) - 1
 			 );
+			 "% to '%'\n".postf( i+1, ~canto.instruments[item] );
 		};
 	});
 });
