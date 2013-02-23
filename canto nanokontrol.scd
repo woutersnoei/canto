@@ -37,10 +37,11 @@ NanoKONTROL.knobs[0][8].action_({ |sl|
 	~canto.mod = sl.value!13;
 });	
 
+// set panning mode
 NanoKONTROL.buttons[0][8].action = { |bt| 
 	switch( bt.value.asInt,
 		1, { 
-			 q.verb.views.power.valueAction = 1;
+			 ~canto.setFastPan;
 		}
 	);
 };
@@ -48,7 +49,7 @@ NanoKONTROL.buttons[0][8].action = { |bt|
 NanoKONTROL.buttons[0][17].action = { |bt| 
 	switch( bt.value.asInt,
 		1, { 
-			 q.verb.views.power.valueAction = 0;
+			 ~canto.setSlowPan;
 		}
 	);
 };
