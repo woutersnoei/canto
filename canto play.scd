@@ -84,7 +84,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 		LFDNoise1.kr(0.25.dup(4)).range(0.01,0.99)
 		//TRand.kr(0.dup,1,In.kr(1) )
 	).sum;
-	sig = sig + GrayNoise.ar(0.15);
+	sig = sig + BrownNoise.ar(0.15);
 	
 	//sig = sig ring1: SinOsc.ar( LFDNoise1.kr( 20 ).exprange(1000,6000), 0, 0.75);
 	//freq = TExpRand.kr(0.25,1,In.kr(1) ).lag(0.05) * freq;
@@ -99,7 +99,7 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	
 	cutenv = Select.kr( Latch.kr( inclick, inclick ) * 5, \amps.kr( 1.dup(n) ) )
 		.clip(-80.dbamp,1).lincurve( -80.dbamp, 1, sharpness.linlin(18,32,1,2), sharpness.linlin(18,32,1,36), -4 )
-		.varlag(0.05 + mod);
+		.varlag(0.05);
 	
 	sig = BLowPass.ar( sig, (
 		freq.blend( 
@@ -110,6 +110,18 @@ SynthDef( "canto_note2", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 			//SinOsc.kr( mfreq, 0, mamt )
 		)
 		.clip(20,20000), 0.125 );
+		
+	/*
+	cutenv = freq.blend( LFDNoise3.kr(0.1).exprange( 40,100 ), 0.1) * sharpness.linlin(1,15,32,1);
+		
+	sig = SelectCF.ar( (Latch.kr( inclick, inclick ) * 5) - 1, 
+		BLowPass.ar( sig, 
+			(
+				\amps.kr( 1.dup(n) ).clip(-80.dbamp,1).lincurve( -80.dbamp, 1, sharpness.linlin(18,32,1,2), sharpness.linlin(18,32,1,36), -4 ) * cutenv 
+		) .clip(20,20000), 0.125 
+	), 0.02, 0 );
+	*/
+				
 	//sig = (sig / 4).softclip * 4;
 	
 	//sig = BLowCut.ar( sig, (freq * (cutenv / 2)).clip(20,20000), 3 );
