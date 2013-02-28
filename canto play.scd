@@ -146,8 +146,8 @@ SynthDef( "canto_noteNoise", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, s
 	dev = (dev / 2).midiratio - 1;
 	envs = n.collect({ |i|
 		Env.perc(ExpRand(
-			sharpness.linlin(16,32,0.025,0.005).clip(0.005,0.025,),
-		0.04),1,0.99,(i+1).neg * damp).ar + 0.01;
+			sharpness.linlin(16,32,0.02,0.0025).clip(0.0025,0.02,),
+		0.02),1,0.99,(i+1).neg * damp).ar + 0.01;
 	});
 	amps = \amps.kr( 1.dup(n) );
 	//amps = ExpRand(0.005.dup(n),1);
