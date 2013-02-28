@@ -133,7 +133,7 @@ SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
 	sig = RemoveBadValues.ar(sig);
-	OffsetOut.ar( 0, sig * env * amp * 1 );
+	OffsetOut.ar( 0, sig * env * amp * 0.25 );
 }).load(s);
 );
 
@@ -232,12 +232,14 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 ~canto.instruments[4] = 'canto_hihat';
 ~canto.instruments[10] = 'canto_bass';
 
-~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0, hpf = 20|
+~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0, hpf = 20, gain = 0|
 	if(  evt.instruments[ track ].asSymbol !== 'canto_hihat' ) {
-		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
+		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, 
+			amp: amp * gain.dbamp, 
 			damp: damp, sharpness: sharpness, mod: mod, hpf: hpf, amps: amps ? (1!5) ] );
 	} {
-		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
+		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, 
+			amp: amp * gain.dbamp, 
 			damp: damp, sharpness: sharpness, mod: mod,  hpf: hpf] );
 	};
 };
@@ -256,6 +258,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 ~canto.amp = { (PintC( Pwhite(0,1), 0.01 ).linexp(0,1,-15.dbamp,1) * 0.1).asStream }!13;
 ~canto.sharpness = { Pbrown(0,1,0.05).linexp(0,1,3,8).asStream }!13;
 
+~canto.gain = 0!13; ~canto.gain[10] = 12;
 
 ~canto.hpf = ~canto.hpf ? EM(); 13.do({ |i| ~canto.hpf[i] = 20 });
 
@@ -314,7 +317,8 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 						evt.sharpness[ track ].value,
 						evt.amp[ track ].value,
 						evt.mod[ track ].value,
-						evt.hpf[ track ].value
+						evt.hpf[ track ].value,
+						evt.gain[ track ].value
 					);
 				});
 			};
