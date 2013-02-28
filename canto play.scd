@@ -35,7 +35,7 @@ TempoClock.tempo = 57 / 60;
 
 (
 SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpness = 2, pan = 0, 
-	dev = 0.3, mod = 0.25|
+	dev = 0.3, mod = 0.25, hpf = 20|
 	var sig, envs, env, n=5;
 	var amps, freqs, modfreq;
 	dev = (dev / 2).midiratio - 1;
@@ -66,6 +66,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpn
 	sig = CombC.ar( sig, 1/100, 1/modfreq, 
 		0.01 + (mod * 0.04) );
 	sig = BPeakEQ.ar( sig, 1000, 1, mod * -3 );
+	sig = BLowCut.ar( sig, hpf, 2 );
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
 	sig = RemoveBadValues.ar(sig);
@@ -74,7 +75,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpn
 );
 
 (
-SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0, mod = 0.25|
+SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0, mod = 0.25, hpf = 20|
 	var sig, envs, env, n=5;
 	var amps, cutenv;
 	var inclick;
@@ -126,7 +127,8 @@ SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	
 	//sig = BLowCut.ar( sig, (freq * (cutenv / 2)).clip(20,20000), 3 );
 	//sig = sig * Line.kr( 1, sharpness.linlin(17,32,1,0.1), sustain );
-
+	
+	sig = BLowCut.ar( sig, hpf, 2 );
 	sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + (pan * 0.1));
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
@@ -137,7 +139,7 @@ SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 
 (
 SynthDef( "canto_noteNoise", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpness = 2, pan = 0, 
-	dev = 0.3, mod = 0.25|
+	dev = 0.3, mod = 0.25, hpf = 20|
 	var sig, envs, env, n=5;
 	var amps, freqs, modfreq;
 	var moddev;
@@ -194,6 +196,7 @@ SynthDef( "canto_noteNoise", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, s
 		0.01 );
 	
 	sig = BPeakEQ.ar( sig, 1000, 1, mod * -3 );
+	sig = BLowCut.ar( sig, hpf, 2 );
 	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
 	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
 	sig = RemoveBadValues.ar(sig);
@@ -229,13 +232,13 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 ~canto.instruments[4] = 'canto_hihat';
 ~canto.instruments[10] = 'canto_bass';
 
-~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0|
+~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0, hpf = 20|
 	if(  evt.instruments[ track ].asSymbol !== 'canto_hihat' ) {
 		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
-			damp: damp, sharpness: sharpness, mod: mod, amps: amps ? (1!5) ] );
+			damp: damp, sharpness: sharpness, mod: mod, hpf: hpf, amps: amps ? (1!5) ] );
 	} {
 		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, amp: amp, 
-			damp: damp, sharpness: sharpness, mod: mod ] );
+			damp: damp, sharpness: sharpness, mod: mod,  hpf: hpf] );
 	};
 };
 
@@ -252,6 +255,9 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 
 ~canto.amp = { (PintC( Pwhite(0,1), 0.01 ).linexp(0,1,-15.dbamp,1) * 0.1).asStream }!13;
 ~canto.sharpness = { Pbrown(0,1,0.05).linexp(0,1,3,8).asStream }!13;
+
+
+~canto.hpf = ~canto.hpf ? EM(); 13.do({ |i| ~canto.hpf[i] = 20 });
 
 ~canto.setSlowChange;
 
@@ -307,7 +313,8 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 						evt.damp[ track ][(pos * 5).round(1)].collect(_.value),
 						evt.sharpness[ track ].value,
 						evt.amp[ track ].value,
-						evt.mod[ track ].value
+						evt.mod[ track ].value,
+						evt.hpf[ track ].value
 					);
 				});
 			};
