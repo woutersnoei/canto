@@ -6,6 +6,9 @@ NanoKONTROL();
 
 ~canto.nanoLastChecked = thisThread.seconds!8;
 
+~canto.hpfCtrl.remove;
+~canto.hpfCtrl = SimpleController( ~canto.hpf );
+
 ([ 2, 3, 4, 5, 6, 7, 8, 9]+1).do({ |item, i|
 	NanoKONTROL.sliders[0][i].action_({ |sl| 
 		var now;
@@ -35,6 +38,14 @@ NanoKONTROL();
 			 "% to '%'\n".postf( i+1, ~canto.instruments[item] );
 		};
 	});
+	
+	e.actions.slider[i+16] = { |sl| ~canto.hpf[ item ] = sl.value.linexp(0,1,20,2000) };
+	~canto.hpfCtrl.put( item, { 
+			e.active = false;
+			e.sliders[i+16].valueAction = ~canto.hpf[ item ].explin(20,2000,0,1);
+			e.active = true;
+	});
+	
 });
 
 // verb on slider 9
