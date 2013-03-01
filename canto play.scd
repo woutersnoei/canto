@@ -255,7 +255,7 @@ SynthDef( "canto_noteFormant", { |amp = 0.1, sustain = 1, damp = 16, freq = 440,
 	
 	sig = (freqs.collect({ |fr,i|
 		var sg;
-		sg = Formant.ar( fr, formants[i], fr * mod.linlin(0,1,2,4) );
+		sg = Formant.ar( fr, formants[i], fr * mod.linlin(0,1,1,4) );
 		sg
 	}) / n) * envs;
 	
