@@ -175,11 +175,11 @@ SynthDef( "canto_noteNoise", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, s
 		sg
 	}) * amps;
 	*/
-	moddev = 1.01 + (mod * 0.25);
+	moddev = 1.01 + (mod * 0.5);
 	
 	sig = freqs.collect({ |fr,i|
 		var sg;
-		sg = SinOsc.ar( GrayNoise.ar(1).exprange( fr/moddev, fr*moddev ) );
+		sg = SinOsc.ar( (WhiteNoise.ar(0.5) + PinkNoise.ar(0.5)).exprange( fr/moddev, fr*moddev ) );
 		sg
 	}) * amps;
 	
@@ -259,6 +259,7 @@ SynthDef( "canto_noteFormant", { |amp = 0.1, sustain = 1, damp = 16, freq = 440,
 		sg
 	}) / n) * envs;
 	
+	//sig = DelayN.ar( sig, 0.2, Rand(0.dup(sig.size),0.2) );
 		
 	//sig = BLowPass.ar( sig, freq * XLine.kr(3,1,sustain), 0.33 );
 	
