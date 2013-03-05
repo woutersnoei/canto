@@ -146,6 +146,7 @@
 					(1/24).wait;
 				});
 			}).start;
+			views[ \tempo ].value = TempoClock.tempo * 60
 			
 		});
 		
