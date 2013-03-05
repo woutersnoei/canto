@@ -584,10 +584,21 @@ e.doReset = { |evt, dur = 0.35|
 	var oldVals, visibleSliders;
 	visibleSliders = e.sliders.select({ |item,i| (i-e.offset).inclusivelyBetween(0,7) });
 	e.scrollTask !? { e.scrollTask.stop };
-	e.hwSetAll( [ \slider, \master, \knob, \level, \on, \solo, \rec, \sel, \label, \knobLabel ] );
+	e.hwSetAll( [ \softSetSlider, \master, \knob, \level, \on, \solo, \rec, \sel, 
+	//\label, \knobLabel 
+	] );
 	};
 	
-e.doReset;
+e.doQuickReset = { |evt, dur = 0.35|	
+	var oldVals, visibleSliders;
+	visibleSliders = e.sliders.select({ |item,i| (i-e.offset).inclusivelyBetween(0,7) });
+	e.scrollTask !? { e.scrollTask.stop };
+	e.hwSetAll( [ \slider, \master, \knob, \level, \on, \solo, \rec, \sel, 
+	//\label, \knobLabel 
+	] );
+	};
+	
+e.doQuickReset;
 
 // couple master slider to volume
 e.actions.master = { |sl| s.volume.volume = [-inf,6,\db].asSpec.map( sl.value ) };
