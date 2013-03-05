@@ -123,3 +123,29 @@ NanoKONTROL.buttons[0][23].action = { |bt|
 		}
 	);
 };
+
+// tempo via buttons
+e.buttons.rec[15].valueAction = 1;
+e.buttons.solo[15].valueAction = 1;
+e.buttons.on[15].valueAction = 1;
+// e.actions.slider[15] = { |sl| TempoClock.tempo = sl.value.linlin(0,1,50,70).round(0.1)/60 };
+e.actions.slider[15] = nil;
+e.actions.button.on[15] = { |bt| 
+	 if( bt.value == 0 ) {
+		 TempoClock.tempo = (TempoClock.tempo + (0.1 / 60)).min( 70/60 );
+	 };
+	 bt.valueAction = 1;
+};
+e.actions.button.solo[15] = { |bt| 
+	 if( bt.value == 0 ) {
+		 TempoClock.tempo = (TempoClock.tempo - (0.1 / 60)).max( 50/60 );
+	 };
+	 bt.valueAction = 1;
+};
+
+~canto.tempoJack !? _.stop;
+~canto.tempoJack = SkipJack( {
+	e.active = false;
+	e.sliders[15].valueAction = (TempoClock.tempo * 60).linlin(50,70,0,1);
+	e.active = true;
+} );
