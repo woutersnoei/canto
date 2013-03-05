@@ -20,7 +20,7 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 	var env;
 	
 	times = \times.kr( 0!20 ).clump(5);
-	
+	time = time.lag(1);
 	mod = SinOsc.kr( (modSpeed / time) * Rand(0.9.dup(10), 1.1), Rand(0.dup(10),2pi), modAmt.lag(1) );
 	
 	input = In.ar( in + (private * (NumOutputBuses.ir + NumInputBuses.ir) ) );
@@ -59,7 +59,7 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	var env;
 	
 	times = \times.kr( 0!20 ).clump(5);
-	
+	time = time.lag(1);
 	mod = SinOsc.ar( 
 		(modSpeed / time) * Rand(0.9.dup(10), 1.1), Rand(0.dup(10),2pi), modAmt.lag(1) 
 	);
@@ -103,7 +103,7 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	\times, 0!20,
 	\vari, 0,
 	\amp, 0.1,
-	\modSpeed, 5,
+	\modSpeed, 1,
 	\modAmt, 0,
 	\pshift, 0,
 	\pdisp, 0,
@@ -117,27 +117,31 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	};
 });
 
+~canto.delay.global.timesRes = 1;
+~canto.delay.global.timesMax = 4;
+
+
 ~canto.delay.global.updateTime = { |evt| evt.time = 1/TempoClock.tempo; };
 
-~canto.delay.global.setTimes = { |evt, time, res = 1, max = 5.0| 
-	time = (time ?? { { (0.0 rrand: max).round(res); }!20; }).asCollection;
+~canto.delay.global.setTimes = { |evt, time| 
+	time = (time ?? { { (0.0 rrand: evt.timesMax).round(evt.timesRes); }!20; }).asCollection;
 	if( time.size != 20 ) { time = time.wrapExtend( 20 ) };
 	evt.times = time;
 };
 
-~canto.delay.global.setSingleTime = { |evt, time, res = 1, max = 5.0| 
-	time = time ?? { (0.0 rrand: max).round(res) };
+~canto.delay.global.setSingleTime = { |evt, time| 
+	time = time ?? { (0.0 rrand: evt.timesMax).round(evt.timesRes) };
 	evt.times = time!20;
 };
 
-~canto.delay.global.setQuadTime = { |evt, time, res = 1, max = 5.0| 
-	time = (time ?? { {(0.0 rrand: max).round(res)}!4 }).asCollection;
+~canto.delay.global.setQuadTime = { |evt, time| 
+	time = (time ?? { {(0.0 rrand: evt.timesMax).round(evt.timesRes)}!4 }).asCollection;
 	if( time.size != 4 ) { time = time.wrapExtend( 4 ) };
 	evt.times = time.stutter(5);
 };
 
-~canto.delay.global.setSyncTimes = { |evt, time, res = 1, max = 5.0| 
-	time = (time ?? { {(0.0 rrand: max).round(res)}!5 }).asCollection;
+~canto.delay.global.setSyncTimes = { |evt, time| 
+	time = (time ?? { {(0.0 rrand: evt.timesMax).round(evt.timesRes)}!5 }).asCollection;
 	if( time.size != 5 ) { time = time.wrapExtend( 5 ) };
 	evt.times = time.dup(4).flatten(1);
 };
@@ -189,6 +193,39 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 		);
 	};
 	
+	e.actions.button.on[index] = { |bt|
+		evt.timesRes = 1;
+		evt.setTimes;
+	};
+	
+	e.actions.button.solo[index] = { |bt|
+		evt.timesRes = 0.5;
+		evt.setTimes;
+	};
+	
+	e.actions.slider[index+1] = { |sl|
+		evt.modSpeed = sl.value.linexp(0,1,1,1000);
+	};
+	
+	e.actions.knob[index+1] = { |sl|
+		evt.modAmt = sl.value * 0.001;
+	};
+	
+	e.actions.button.on[index+1] = { |bt|
+		switch( bt.value.asInt,
+			1, { evt.pshift = 12 },
+			0, { evt.pshift = 0 }
+		);
+	};
+	
+	e.actions.button.solo[index+1] = { |bt|
+		switch( bt.value.asInt,
+			1, { evt.tvar = 0.1 },
+			0, { evt.tvar = 0 }
+		);
+	};
+	
+	
 	evt.ctrl.remove;
 	evt.ctrl = SimpleController( evt )
 		.put( \amp, { 
@@ -209,8 +246,40 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 				e.knobs[index].valueAction = vari;
 			};
 			e.active = true;
-		});
-	[ \amp, \synth, \vari ].do({ |item| evt.changed(item) });
+		})
+		.put( \modSpeed, {
+			e.active = false;
+			e.sliders[index+1].valueAction = evt.modSpeed.explin(1,1000,0,1);
+			e.active = true;
+		})
+		.put( \modAmt, {
+			e.active = false;
+			e.knobs[index+1].valueAction = evt.modAmt / 0.001;
+			e.active = true;
+		})
+		.put( \timesRes, {
+			e.active = false;
+			e.buttons.on[index].valueAction = (evt.timesRes > 0.75).binaryValue;
+			e.buttons.solo[index].valueAction = (evt.timesRes < 0.75).binaryValue;
+			e.active = true;
+		})
+		.put( \modAmt, {
+			e.active = false;
+			e.knobs[index+1].valueAction = evt.modAmt / 0.001;
+			e.active = true;
+		})
+		.put( \pshift, {
+			e.active = false;
+			e.buttons.on[index+1].valueAction = (evt.pshift > 6).binaryValue;
+			e.active = true;
+		})
+		.put( \tvar, {
+			e.active = false;
+			e.buttons.solo[index+1].valueAction = (evt.tvar > 0.05).binaryValue;
+			e.active = true;
+		})
+		;
+	[ \amp, \synth, \vari, \timesRes, \pshift, \tvar ].do({ |item| evt.changed(item) });
 };
 );
 
@@ -226,9 +295,16 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	);
 };
 
+~canto.delayCtrl.remove;
+~canto.delayCtrl = SimpleController( ~canto );
+~canto.delayCtrl.put( \bar, { |...args|
+	~canto.delay.global.updateTime;
+	~canto.delay.input.updateTime;
+});
+
 if( e.notNil ) { 
 	~canto.delay.global.iconnect( 8 );
-	~canto.delay.input.iconnect( 9 );
+	~canto.delay.input.iconnect( 10 );
  };
 
 (
@@ -244,8 +320,8 @@ RoundView.useWithSkin( (font: Font( "Helvetica", 9 ) ),
 	{	
 	
 	[ \input, \global ].do({ |which|
-		var res = 1, max = 5;
 		var ctrl, filterSliders, powerButton;
+		var maxBox, resButton;
 		
 		ctrl = SimpleController( ~canto.delay[ which ] );
 		
@@ -272,23 +348,23 @@ RoundView.useWithSkin( (font: Font( "Helvetica", 9 ) ),
 				~canto.delay[ which ].updateTime;
 			});
 		
-		SmoothNumberBox( ~canto.delayWindow, 25@16 )
-			.value_( max )
+		maxBox = SmoothNumberBox( ~canto.delayWindow, 25@16 )
+			.value_(  ~canto.delay[ which ].timesMax )
 			.step_(1)
 			.scroll_step_(1)
 			.clipLo_(2)
 			.clipHi_(9)
 			.action_({ |nb|
-				max = nb.value;
+				 ~canto.delay[ which ].timesMax = nb.value;
 			});
 			
-		SmoothButton( ~canto.delayWindow, 25@16 )
+		resButton = SmoothButton( ~canto.delayWindow, 25@16 )
 			.label_( [ "1", "0.5" ] )
-			.value_( 0 )
+			.value_( (~canto.delay[ which ].timesRes < 0.75).binaryValue )
 			.action_({ |bt|
 				switch( bt.value, 
-					1, { res = 0.5; },
-					0, { res = 1; }
+					1, {  ~canto.delay[ which ].timesRes = 0.5; },
+					0, { ~canto.delay[ which ].timesRes = 1; }
 				);
 			});
 			
@@ -298,7 +374,7 @@ RoundView.useWithSkin( (font: Font( "Helvetica", 9 ) ),
 			SmoothButton( ~canto.delayWindow, 60@15 )
 				.label_( item )
 				.action_({ |bt|
-					~canto.delay[ which ].perform( ("set" ++ item).asSymbol, nil, res, max )
+					~canto.delay[ which ].perform( ("set" ++ item).asSymbol, nil )
 				});
 		});
 			
@@ -338,6 +414,14 @@ RoundView.useWithSkin( (font: Font( "Helvetica", 9 ) ),
 			 filterSliders.do({ |sl, i|
 			 	sl.value = [ sl.value[0], ~canto.delay[ which ].hicut[i] ];
 			 });
+		 });
+		 
+		 ctrl.put( \timesMax, {
+			 maxBox.value = ~canto.delay[ which ].timesMax;
+		 });
+		 
+		 ctrl.put( \timesRes, {
+			 resButton.value = (~canto.delay[ which ].timesRes < 0.75).binaryValue;
 		 });
 		 
 		~canto.delayWindow.addToOnClose({ ctrl.remove; });

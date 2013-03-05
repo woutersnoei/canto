@@ -159,8 +159,8 @@ SynthDef( "canto_revDelay_quadIn", { |in = 0, private = 0, amp = 0.1,
 };
 
 if( e.notNil ) { 
-	~canto.revDelay.global.iconnect( 10 );
-	~canto.revDelay.input.iconnect( 11 );
+	~canto.revDelay.global.iconnect( 12 );
+	~canto.revDelay.input.iconnect( 13 );
  };
 
 (
