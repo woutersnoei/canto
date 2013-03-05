@@ -9,6 +9,9 @@ NanoKONTROL();
 ~canto.hpfCtrl.remove;
 ~canto.hpfCtrl = SimpleController( ~canto.hpf );
 
+~canto.noteDurCtrl.remove;
+~canto.noteDurCtrl = SimpleController( ~canto.noteDur );
+
 ([ 2, 3, 4, 5, 6, 7, 8, 9]+1).do({ |item, i|
 	NanoKONTROL.sliders[0][i].action_({ |sl| 
 		var now;
@@ -45,6 +48,15 @@ NanoKONTROL();
 			e.sliders[i+16].valueAction = ~canto.hpf[ item ].explin(20,2000,0,1);
 			e.active = true;
 	});
+	
+	e.actions.knob[i+16] = { |sl| 
+		~canto.noteDur[ item ] = sl.value.linlin(0,1,0,2).max(1/5).round(1/5);
+	};
+	~canto.noteDurCtrl.put( item, { 
+			e.active = false;
+			e.knobs[i+16].valueAction = ~canto.noteDur[ item ].linlin(0,2,0,1);			e.active = true;
+	});
+	e.buttons.rec[i+16].valueAction = 1;
 	
 });
 

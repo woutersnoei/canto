@@ -309,13 +309,13 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 ~canto.instruments[4] = 'canto_hihat';
 ~canto.instruments[10] = 'canto_bass';
 
-~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0, hpf = 20, gain = 0|
+~canto.playNote = { |evt, track = 0, nn = 64, sustain = 1, amps, pan = 0, damp = 4, sharpness = 2, amp = 0.1, mod = 0, hpf = 20, gain = 0, noteDur = 1|
 	if(  evt.instruments[ track ].asSymbol !== 'canto_hihat' ) {
-		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, 
+		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain * noteDur,  pan: pan, 
 			amp: amp * gain.dbamp, 
 			damp: damp, sharpness: sharpness, mod: mod, hpf: hpf, amps: amps ? (1!5) ] );
 	} {
-		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain,  pan: pan, 
+		Synth( evt.instruments[ track ], [ freq: nn.midicps, sustain: sustain * noteDur,  pan: pan, 
 			amp: amp * gain.dbamp, 
 			damp: damp, sharpness: sharpness, mod: mod,  hpf: hpf] );
 	};
@@ -338,6 +338,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 ~canto.gain = 0!13; ~canto.gain[10] = 12;
 
 ~canto.hpf = ~canto.hpf ? EM(); 13.do({ |i| ~canto.hpf[i] = 20 });
+~canto.noteDur = ~canto.noteDur ? EM(); 13.do({ |i| ~canto.noteDur[i] = 1 });
 
 ~canto.setSlowChange;
 
@@ -395,7 +396,9 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 						evt.amp[ track ].value,
 						evt.mod[ track ].value,
 						evt.hpf[ track ].value,
-						evt.gain[ track ].value
+						evt.gain[ track ].value,
+						evt.noteDur[ track ].value,
+
 					);
 				});
 			};
