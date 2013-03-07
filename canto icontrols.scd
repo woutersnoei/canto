@@ -286,6 +286,21 @@ e.hwSetText = { |evt, i, string = "", type = \label| // \label or \knob
 	};		
 };
 
+e.hwTransportDict = (
+	'rewind': 91,
+	'forward': 92, 
+	'stop': 93,
+	'play': 94,
+	'roundarrow': 86,
+	'record': 95,
+	'r': 74,
+	'w': 75
+);
+
+e.hwSetTransport = { |evt, type = \rewind, value|
+	evt.m.noteOn( 0, evt.hwTransportDict[type.toLower], value * 127 ); 
+};
+
 // the window
 e.w = Window( "i-Controls Pro", Rect(1440 - 467, 64, ((49 * e.nSliders) + 4), 250), false, scroll: true ).front;
 
@@ -610,5 +625,8 @@ e.volumeCtrl.put( \amp, {
 });
 s.volume.volume = s.volume.volume;
 
-
+e.actions.bank.all = { 
+	e.hwSetTransport( \forward, (e.offset > 7).binaryValue ); 
+	e.hwSetTransport( \play, (e.offset > 15).binaryValue ); 
+};
 )
