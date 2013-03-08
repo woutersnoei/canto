@@ -42,6 +42,7 @@ NanoKONTROL();
 		};
 	});
 	
+	/*
 	e.actions.slider[i+16] = { |sl| ~canto.hpf[ item ] = sl.value.linexp(0,1,20,2000) };
 	~canto.hpfCtrl.put( item, { 
 			e.active = false;
@@ -57,6 +58,7 @@ NanoKONTROL();
 			e.knobs[i+16].valueAction = ~canto.noteDur[ item ].linlin(0,2,0,1);			e.active = true;
 	});
 	e.buttons.rec[i+16].valueAction = 1;
+	*/
 	
 });
 
