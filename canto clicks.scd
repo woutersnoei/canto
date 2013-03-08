@@ -93,10 +93,87 @@
 				
 		[ \amp, \res, \synth ].do({ |item| evt.changed(item) });
 };
+
+
+~canto.clicks.iconnect2 = { |evt, index = 0|
+	
+	var combspec;
+	combspec = [0.00125,0.4,\exp].asSpec;
+	
+	e.actions.slider[index] = { |sl|
+		evt.amp = \amp.asSpec.map( sl.value );
+	};
+	e.actions.knob[index] = { |sl|
+		evt.res = combspec.map( sl.value );
+	};
+		
+	e.actions.button.rec[index] = { |bt|
+		switch( bt.value.asInt,
+			1, { evt.start },
+			0, { evt.end }
+		);
+	};
+	
+	e.actions.slider[index-1] = { |sl|
+		var lpf, hpf, width;
+		width = (1-e.knobs[index-1].value) / 2;
+		#hpf, lpf = sl.value.linlin( 0, 1,  0+width, 1-width) + [width.neg, width];
+		evt.filter = [ \freq.asSpec.map(hpf), \freq.asSpec.map(lpf) ];
+	};
+	e.actions.knob[index-1] = { |sl|
+		var lpf, hpf, width;
+		width = (1 - sl.value) / 2;
+		#hpf, lpf = e.sliders[index-1].value
+			.linlin( 0, 1, 0 + width,  1 - width) + [width.neg, width];
+		evt.filter = [ \freq.asSpec.map(hpf), \freq.asSpec.map(lpf) ];
+	};
+		
+	e.actions.button.on[index] = { |bt|
+		switch( bt.value.asInt,
+			1, { evt.spd = 100 },
+			0, { evt.spd = 2 }
+		);
+	};
+
+
+	evt.ctrl2.remove;
+	evt.ctrl2 = SimpleController( evt )
+		.put( \amp, { 
+			e.active = false;
+			e.sliders[index].valueAction = \amp.asSpec.unmap( evt.amp );
+			e.active = true;
+		})
+		.put( \res, {
+			e.active = false;
+			e.knobs[index].valueAction = combspec.unmap( evt.res );
+			e.active = true;
+		})
+		.put( \synth, {
+			e.active = false;
+			e.buttons.rec[index].valueAction = evt.synth.notNil.binaryValue;
+			e.active = true;
+		})
+		.put( \filter, {
+			var lpf, hpf, width, center;
+			hpf = \freq.asSpec.unmap( evt.filter[0] );
+			lpf = \freq.asSpec.unmap( evt.filter[1] );
+			width = (lpf - hpf)/2;
+			center = (hpf + width).linlin(0+width,1-width,0,1);
+			e.active = false;
+			e.sliders[index-1].valueAction = center;
+			e.knobs[index-1].valueAction = 1-(width*2);
+			e.active = true;
+		});
+	
+				
+	[ \amp, \res, \synth ].do({ |item| evt.changed(item) });
+};
+
 );
 
 if( e.notNil ) { 
 	~canto.clicks.iconnect( 7 ); 
+	~canto.clicks.iconnect2( 23 ); 
 	//~canto.clicks2.iconnect( 4 ); 
 };
 
