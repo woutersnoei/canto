@@ -2,7 +2,7 @@
 
 6->7/8: met z'n drieen 
 15->16 met z'n drieen
-30-40: arnout geeft aan (incl naar 40 toe)
+30-40: arnout geeft aan
 41: abrupt zacht (wouter geeft aan)
 
 gwyneth: 35 & 78 niet te lang
