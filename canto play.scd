@@ -74,7 +74,7 @@ SynthDef( "canto_note", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpn
 }).load(s);
 );
 
-(
+( // new bass
 SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0, mfreq = 1, mamt = 0, mod = 0.25, hpf = 20|
 	var sig, envs, env, n=5;
 	var amps, cutenv;
@@ -84,7 +84,7 @@ SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	sig = Pulse.ar( (freq * 0.5) + ([-0.5,0.5] +(mod * [-1,1])), 
 		LFDNoise1.kr(0.25.dup(4)).range(0.01,0.99)
 		//TRand.kr(0.dup,1,In.kr(1) )
-	).sum;
+	);
 	sig = sig + BrownNoise.ar(0.15);
 	
 	//sig = sig ring1: SinOsc.ar( LFDNoise1.kr( 20 ).exprange(1000,6000), 0, 0.75);
@@ -129,7 +129,8 @@ SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	//sig = sig * Line.kr( 1, sharpness.linlin(17,32,1,0.1), sustain );
 	
 	sig = BLowCut.ar( sig, hpf, 2 );
-	sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + (pan * 0.1));
+	//sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + (pan * 0.1));
+	sig = Splay.ar( sig, levelComp: false );
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
 	sig = RemoveBadValues.ar(sig);
