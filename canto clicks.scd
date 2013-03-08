@@ -127,6 +127,7 @@ SynthDef( "canto_clicks", { |modSpeed = 0.1, pan = 0.25, gate = 1, amp = 0.1,
 	
 	trg = T2A.ar( In.kr(1) > 0.9 );
 	spds = \spds.kr( 285 ! ~canto.clicks.n );
+	spds = spds.varlag(5,2);
 	filter = filter.lag(0.5);
 	
 	sig = spds.collect({ |spd| 
