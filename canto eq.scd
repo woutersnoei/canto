@@ -8,7 +8,7 @@ SynthDef( "canto_eq", {
 	in = PrivateIn.ar(0,2);
 	sig = ~canto.eq.ar( in, \eqSetting.kr( ~canto.eq.setting ) );
 	PrivateReplaceOut.ar(0,sig);
-	Out.ar( 4, sig );
+	Out.ar( 6, sig );
 }).load;
 
 ~canto.eqView = EQView( eqSetting: ~canto.eq ); // create a gui
@@ -19,3 +19,5 @@ SynthDef( "canto_eq", {
 
 ~canto.eqSynth = Synth( "canto_eq", addAction: \addBefore );
 
+
+~canto.eqSynth.free;
