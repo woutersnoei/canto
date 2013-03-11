@@ -46,7 +46,7 @@
 		})
 		.canFocus_(false);
 		
-	evt.w.view.decorator.shift(30,0);
+	//evt.w.view.decorator.shift(30,0);
 		
 	views[ \return ] = SmoothButton( evt.w, 30@30 )
 		.label_( ['return'] )
@@ -57,8 +57,9 @@
 		
 	views[ \prev ] = SmoothButton( evt.w, 30@30 )
 		.label_( ['rewind'] )
+		.background_( Color.red(1,0.6) )
 		.action_({ |bt|
-			evt.currentIndex = (evt.currentIndex - 1).wrap( 0, evt.cells.size );
+			evt.nextNow(-1);
 		})
 		.canFocus_(false);
 		
@@ -66,6 +67,14 @@
 		.label_( ['forward'] )
 		.action_({ |bt|
 			evt.currentIndex = (evt.currentIndex + 1).wrap( 0, evt.cells.size );
+		})
+		.canFocus_(false);
+		
+	views[ \nextNow ] = SmoothButton( evt.w, 30@30 )
+		.label_( ['forward'] )
+		.background_( Color.red(1,0.6) )
+		.action_({ |bt|
+			evt.nextNow;
 		})
 		.canFocus_(false);
 	

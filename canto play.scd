@@ -432,6 +432,15 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 	if( last != cell ) { "current cell: %\n".postf( cell !? _.id ); };
 };
 
+~canto.jumpNow = { |evt, index = 0|
+	evt.currentIndex = index;
+	evt.currentCell = evt.cells[ evt.currentIndex ];
+};
+
+~canto.nextNow = { |evt, amt = 1|
+	evt.jumpNow( evt.currentIndex + amt );
+};
+
 ~canto.bar_ = { |evt, bar = 0|
 	evt[ \bar ] = bar;
 	if( evt.verbose == true ) { "current bar: %\n".postf(bar+1); };
@@ -448,8 +457,9 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 			dur = evt.currentCell !? _.duration ? dur;
 			inf.do({
 				if( evt.currentCell.notNil ) {
+					//[ evt.bar, variant, dur ].postln;
 					evt.tracks.do({ |track|
-						evt.playBar( track, evt.bar, evt.currentCell, variant );
+						evt.playBar( track, evt.bar % dur, evt.currentCell, variant );
 					});
 				};
 				1.wait;
@@ -458,12 +468,12 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 					if( evt.currentCell.notNil && { evt.currentCell.bridge }) { 
 						evt.currentIndex = evt.currentIndex + 1 
 					};
+					if( evt.currentCell != evt.cells[ evt.currentIndex ]  ) { variant = 0 }; 
 					evt.currentCell = evt.cells[ evt.currentIndex ];
-					if( evt.currentCell.notNil ) { dur = evt.currentCell.duration; };
-					variant = 0; // first
 				} {
 					variant = 1; // second
 				};
+				if( evt.currentCell.notNil ) { dur = evt.currentCell.duration; };
 				if( evt.currentCell != evt.cells[ evt.currentIndex ]  ) { variant = 2 }; // last
 			});
 		}).start;
