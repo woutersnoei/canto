@@ -38,8 +38,8 @@ SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000|
 
 ~canto.bassAmp = 0.0;
 ~canto.snareAmp = 0;
-~canto.bassDelay = { 4.rand/5 };
-~canto.snareDelay = { 4.rand/5 };
+~canto.bassDelay = { [0, 4/5].choose };
+~canto.snareDelay = { [0, 2/5].choose };
 
 ~canto.snareDisperse = 0.001;
 ~canto.snareFreq = 3000;
@@ -71,10 +71,12 @@ SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000|
 			2, {
 				if(  (~canto.bassAmp > 0) && (~canto.snareAmp > 0) ) {
 					{
-						~canto.bassDelay.value.wait;
-						s.makeBundle( 0.1, { 
-							Synth( "bassdrum", [ \amp, ~canto.bassAmp ] ); 
-						}); 
+						if( 0.5.coin ) {
+							~canto.bassDelay.value.wait;
+							s.makeBundle( 0.1, { 
+								Synth( "bassdrum", [ \amp, ~canto.bassAmp ] ); 
+							}); 
+						};
 					}.fork;
 				};
 			},
