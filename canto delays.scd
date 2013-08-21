@@ -13,7 +13,7 @@
 SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latency = 0.02,
 		modSpeed = 5, modAmt = 0, pshift = 0, pdisp = 0, tvar = 0,
 		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000]|
-	var delays, input, index;
+	var delays, shifted, input, index;
 	var trig;
 	var times;
 	var mod;
@@ -21,12 +21,14 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 	
 	times = \times.kr( 0!20 ).clump(5);
 	time = time.lag(1);
-	mod = SinOsc.kr( (modSpeed / time) * Rand(0.9.dup(10), 1.1), Rand(0.dup(10),2pi), modAmt.lag(1) );
+	mod = SinOsc.kr( (modSpeed / time) * Rand(0.9.dup(10), 1.1), Rand(0.dup(10),2pi), modAmt.max(0).lag(1) * 0.001 );
 	
 	input = In.ar( in + (private * (NumOutputBuses.ir + NumInputBuses.ir) ) );
 	delays = DelayC.ar( input, 2.1, 
 		((((1,1.5..9)/5) * time) + mod) - (latency + (tvar.lag(5) /2))
 	);
+	shifted = FreqShift.ar( delays, modSpeed.lag(1) * 5 * LFNoise1.kr(0.1.dup( delays.size ) ).range(0,1) );
+	delays = delays.blend( shifted, modAmt.neg.max(0) );
 	delays = BLowCut.ar( delays, lowcut.lag(0.1).clip(20,20000), 4 );
 	delays = BHiCut.ar( delays, hicut.lag(0.1).clip(20,20000), 4 );
 	//index = TIRand.kr(0.dup(4),4, TDelay.kr( In.kr(1), (time/5) - 0.05 ) );
@@ -52,7 +54,7 @@ SynthDef( "canto_randdelay", { |in = 0, private = 0, time = 1, amp = 0.1, latenc
 SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1, latency = 0.02,
 		modSpeed = 5, modAmt = 0, pshift = 0, pdisp = 0, tvar = 0,
 		vari = 0,  gate = 1, lowcut = #[200,200,200,200,200], hicut = #[20000,20000,20000,20000,20000]|
-	var delays, input, index;
+	var delays, shifted, input, index;
 	var trig;
 	var times;
 	var mod;
@@ -61,7 +63,7 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	times = \times.kr( 0!20 ).clump(5);
 	time = time.lag(1);
 	mod = SinOsc.ar( 
-		(modSpeed / time) * Rand(0.9.dup(10), 1.1), Rand(0.dup(10),2pi), modAmt.lag(1) 
+		(modSpeed / time) * Rand(0.9.dup(10), 1.1), Rand(0.dup(10),2pi), modAmt.max(0).lag(1) * 0.001
 	);
 	
 	input = WhiteNoise.ar(1e-10);
@@ -73,10 +75,12 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	delays = DelayC.ar( input, 2.1, 
 		((((1,1.5..9)/5) * time) + mod) - (latency + (tvar.lag(5) /2))
 	);
+	shifted = FreqShift.ar( delays, modSpeed.lag(1) * 5 * LFNoise1.kr(0.05.dup( delays.size ) ).range(0,1) );
+	delays = delays.blend( shifted, modAmt.neg.max(0) );
 	delays = BLowCut.ar( delays, lowcut.lag(0.1).clip(20,20000), 4 );
 	delays = BHiCut.ar( delays, hicut.lag(0.1).clip(20,20000), 4 );
 	//index = TIRand.kr(0.dup(4),4, TDelay.kr( In.kr(1), (time/5) - 0.05 ) );
-	trig = TDelay.kr( In.kr(1), (time/5) - 0.05 );
+	trig = TDelay.kr( In.kr(1), (time/5) - 0.025 );
 	index = times.collect({ |times| Demand.kr( trig, trig > 0.9, Dseq( times, inf ) ); });
 	index = (index + TIRand.kr(0.dup(4), vari, trig ));
 	//Poll.kr( trig > 0.9, index );
@@ -84,7 +88,7 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 		var ampx;
 		i = i/2;
 		ampx = InRange.kr( index, i-0.25, i+0.25 );
-		ampx = Slew.kr( ampx, 20, 20 );
+		ampx = Slew.kr( ampx, 40, 40 );
 		item * ampx;
 	});
 	
@@ -208,7 +212,7 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 	};
 	
 	e.actions.knob[index+1] = { |sl|
-		evt.modAmt = sl.value * 0.001;
+		evt.modAmt = sl.value.linlin(0,1,-1,1);
 	};
 	
 	e.actions.button.on[index+1] = { |bt|
@@ -254,18 +258,13 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 		})
 		.put( \modAmt, {
 			e.active = false;
-			e.knobs[index+1].valueAction = evt.modAmt / 0.001;
+			e.knobs[index+1].valueAction = evt.modAmt.linlin(-1,1,0,1);
 			e.active = true;
 		})
 		.put( \timesRes, {
 			e.active = false;
 			e.buttons.on[index].valueAction = (evt.timesRes > 0.75).binaryValue;
 			e.buttons.solo[index].valueAction = (evt.timesRes < 0.75).binaryValue;
-			e.active = true;
-		})
-		.put( \modAmt, {
-			e.active = false;
-			e.knobs[index+1].valueAction = evt.modAmt / 0.001;
 			e.active = true;
 		})
 		.put( \pshift, {
@@ -279,7 +278,7 @@ SynthDef( "canto_randdelay_quadin", { |in = 0, private = 0, time = 1, amp = 0.1,
 			e.active = true;
 		})
 		;
-	[ \amp, \synth, \vari, \timesRes, \pshift, \tvar ].do({ |item| evt.changed(item) });
+	[ \amp, \synth, \vari, \timesRes, \modSpeed, \modAmt, \pshift, \tvar ].do({ |item| evt.changed(item) });
 };
 );
 
@@ -383,7 +382,7 @@ RoundView.useWithSkin( (font: Font( "Helvetica", 9 ) ),
 		  'pshift', [-12,12,\lin,1,0].asSpec,
 		  'pdisp', [0,12,\lin,0.1,0].asSpec,
 		  'tvar', [0, 0.1, \lin, 0 ].asSpec,
-		  'modAmt', [0, 0.001, \lin, 0,0 ].asSpec,
+		  'modAmt', [-1, 1, \lin, 0,0 ].asSpec,
 		  'modSpeed', [1,1000,\exp,1,5].asSpec
 		 ].pairsDo({ |key, spec|
 			 var sl;
