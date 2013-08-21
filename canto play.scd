@@ -282,6 +282,42 @@ SynthDef( "canto_noteFormant", { |amp = 0.1, sustain = 1, damp = 16, freq = 440,
 }).load(s);
 );
 
+(
+SynthDef( "canto_noteFilt", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, sharpness = 2, pan = 0, 
+	dev = 0.3, mod = 0.25, hpf = 20|
+	var sig, envs, env, n=5;
+	var amps, freqs, modfreq;
+	var formants;
+	var moddev;
+	var dur;
+
+	dur = sustain * sharpness.linlin(16,32,1,0.1).clip(0.01,1);
+
+	amps = \amps.kr( 1.dup(n) );
+	
+	formants = amps.linlin( 0, 1, sharpness.fold(16.5,32).linexp(16.5,32, freq, 2000 ) , 
+		//freq * sharpness.fold(1,16.5).lincurve(1,16.5,12,1,4) 
+		sharpness.fold(16.5,32).linexp(16.5,32, freq, 20000 ) 
+	);
+	
+	sig = { Saw.ar( freq + Rand(-2,2), 0.25 ) + Pulse.ar( freq + Rand(-2,2), 0.25 ); }!n;
+	
+	sig = MoogVCF.ar( sig, 
+		Env.perc(0.01,dur * 4).kr.linexp( 0,1, freq, 
+			//sharpness.fold(16.5,32).linexp(16.5,32, freq, 15000 ) 
+			formants
+		), K2A.ar( mod.linlin(0,1,0.8,1.0) )
+	);
+	
+	
+	sig = sig.sum / n.sqrt;
+
+	sig = RoundPan.ar(~canto.numChan ? 4, sig, Rand(-0.05,0.05) + pan);
+	env = Env([1,1,0], [sustain * sharpness.linlin(16,32,1,0.01).clip(0.01,1), 0.1]).ar(2);
+	sig = RemoveBadValues.ar(sig);
+	OffsetOut.ar( 0, sig * env * amp );
+}).load(s);
+);
 
 (
 SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 0.0075, sharpness = 2, pan = 0|
@@ -304,7 +340,7 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 }).load(s);
 );
 
-~canto.defNames = [ 'canto_bass', 'canto_noteFormant', 'canto_note', 'canto_noteNoise', 'canto_hihat' ];
+~canto.defNames = [ 'canto_bass', 'canto_noteFilt', 'canto_noteFormant', 'canto_note', 'canto_noteNoise', 'canto_hihat' ];
 
 ~canto.instruments = 'canto_note'!14;
 
