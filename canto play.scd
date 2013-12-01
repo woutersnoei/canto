@@ -81,55 +81,31 @@ SynthDef( "canto_bass", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev = 
 	var inclick;
 	inclick = In.kr(1);
 	mod = mod * 0.25;
-	sig = Pulse.ar( (freq * 0.5) + ([-0.5,0.5] +(mod * [-1,1])), 
+	sig = Pulse.ar( (freq * 0.5) + ([-0.5,0.5] +(mod * [-1,1])),
 		LFDNoise1.kr(0.25.dup(4)).range(0.01,0.99)
-		//TRand.kr(0.dup,1,In.kr(1) )
 	);
 	sig = sig + BrownNoise.ar(0.15);
 	
-	//sig = sig ring1: SinOsc.ar( LFDNoise1.kr( 20 ).exprange(1000,6000), 0, 0.75);
-	//freq = TExpRand.kr(0.25,1,In.kr(1) ).lag(0.05) * freq;
-	
-	//freq = freq * Trig1.kr( In.kr(1), 0.02 ).lag(0,0.5).linexp(0,1,0.4,1);
-	
-	//freq = LFDNoise3.kr(0.05.dup(5))
-	
-	//cutenv = Line.kr( sharpness.linlin(18,32,1,32), sharpness.linlin(18,32,1,8), sustain );
-	
-	//cutenv = Latch.kr(inclick, inclick).lag(0.05).linlin( 0, 1, 1, sharpness.linlin(18,32,1,32) );
-	
-	cutenv = Select.kr( Latch.kr( inclick, inclick ) * 5, \amps.kr( 1.dup(n) ) )
-		.clip(-80.dbamp,1).lincurve( -80.dbamp, 1, sharpness.linlin(18,32,1,2), sharpness.linlin(18,32,1,36), -4 )
-		.varlag(0.05);
+	cutenv = Slew.kr(
+		Select.kr( Latch.kr( inclick, inclick ) * 5, \amps.kr( 1.dup(n) ) )
+			.clip(-80.dbamp,1)
+			.lincurve( -80.dbamp, 1, 
+				sharpness.linlin(18,32,1,2), sharpness.linlin(18,32,1,36), -4 
+			),
+		400,
+		400
+	);	
 	
 	sig = BLowPass.ar( sig, (
 		freq.blend( 
 			LFDNoise3.kr(0.1).exprange( 40,100 ), 0.1) 
 				* sharpness.linlin(1,15,32,1)
 				* cutenv
-				//* SinOsc.kr( 1/sustain, 0.5pi, mod, 1 );
-			//SinOsc.kr( mfreq, 0, mamt )
 		)
 		.clip(20,20000), 0.125 );
 		
-	/*
-	cutenv = freq.blend( LFDNoise3.kr(0.1).exprange( 40,100 ), 0.1) * sharpness.linlin(1,15,32,1);
-		
-	sig = SelectCF.ar( (Latch.kr( inclick, inclick ) * 5) - 1, 
-		BLowPass.ar( sig, 
-			(
-				\amps.kr( 1.dup(n) ).clip(-80.dbamp,1).lincurve( -80.dbamp, 1, sharpness.linlin(18,32,1,2), sharpness.linlin(18,32,1,36), -4 ) * cutenv 
-		) .clip(20,20000), 0.125 
-	), 0.02, 0 );
-	*/
-				
-	//sig = (sig / 4).softclip * 4;
-	
-	//sig = BLowCut.ar( sig, (freq * (cutenv / 2)).clip(20,20000), 3 );
-	//sig = sig * Line.kr( 1, sharpness.linlin(17,32,1,0.1), sustain );
-	
 	sig = BLowCut.ar( sig, hpf, 2 );
-	//sig = RoundPan.ar( ~canto.numChan ? 4, sig, Rand(-0.05,0.05) + (pan * 0.1));
+	sig = sig.sineclip2(mod.linlin(0,0.25,10,0.8) );
 	sig = Splay.ar( sig, levelComp: false );
 	env = Env([0,1,1,0], [0.01, sustain * 1.2, 0.1]).kr(2);
 	//Poll.kr( Impulse.kr(10), sharpness );
@@ -424,7 +400,9 @@ SynthDef( "canto_hihat", { |amp = 0.1, sustain = 1, damp = 16, freq = 440, dev =
 			pos = note[1] - bar;
 			//pos.postln;
 			(pos-time).wait;
-			if( evt.useNote[(pos * 5).round(1).asInt] != false ) {
+			if( evt.useNote[(pos * 5).round(1).asInt] != false && { 
+					evt.amp[ track ].value != 0 
+			} ) {
 				s.makeBundle( 0.1 + (0.00001.rand), { 
 					evt.playNote( track, note[4], note[6] / TempoClock.tempo, 
 						evt.amps[ track ][(pos * 5).round(1)].collect(_.value),
