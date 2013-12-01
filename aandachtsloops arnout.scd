@@ -5,6 +5,8 @@
 30-40: arnout geeft aan
 41: abrupt zacht (wouter geeft aan)
 
+41-69 4X
+
 gwyneth: 35 & 78 niet te lang
 
 omslaan: na 17, 40, 74, 83
