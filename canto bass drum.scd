@@ -16,7 +16,7 @@ SynthDef( "bassdrum", { |amp = 0.25, freq = 44, pulse = 0.1, attackFreq = 100, d
 	OffsetOut.ar(0, sig )
 }).load(s);
 
-SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000|
+SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000, brassage = 0|
 	var sig, tofbsig, fbsig;
 	
 	sig = (
@@ -29,6 +29,7 @@ SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000|
 	tofbsig = PitchShift.ar(tofbsig, [0.1,0.09], 1, disperse, 0.1 );
 	tofbsig = BBandPass.ar( tofbsig, 1500, 15 );
 	LocalOut.ar( tofbsig.rotate(1) );
+	tofbsig = tofbsig * TRand.kr( 0.dup(4), 1, In.kr(1) ).linlin(0,1,1-brassage,1);
 	sig = RemoveBadValues.ar( (sig + (Line.kr(0,1,0.2) * tofbsig))[[0,1]] );
 	Out.ar( 0, sig * 0.5 * Env([1,0], [3], -2 ).kr(2) );
 }).load(s);
@@ -43,8 +44,11 @@ SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000|
 
 ~canto.snareDisperse = 0.001;
 ~canto.snareFreq = 3000;
+~canto.snareBrassage = 0;
+
 /*
 ~canto.bassAmp = 0.3;
+~canto.snareBrassage = 1;
 */
 ~canto.bassCtrl.remove;
 ~canto.bassCtrl = SimpleController( ~canto );
@@ -64,6 +68,7 @@ SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000|
 							\amp, ~canto.snareAmp, 
 							\disperse, ~canto.snareDisperse,
 							\lpf, ~canto.snareFreq ? 3000,
+							\brassage, ~canto.snareBrassage ? 0,
 						] ); 
 					});
 				};
@@ -89,6 +94,7 @@ SynthDef( "canto_snare", { |amp = 0.1, fb = 1.75, disperse = 0.001, lpf = 3000|
 								\amp, ~canto.snareAmp, 
 								\disperse, ~canto.snareDisperse,
 								\lpf, ~canto.snareFreq ? 3000,
+								\brassage, ~canto.snareBrassage ? 0,
 							] ); 
 						}); 
 					}.fork;
@@ -110,6 +116,7 @@ if( e.notNil ) {
 	e.actions.slider[17] = { |sl| ~canto.snareAmp = \amp.asSpec.map( sl.value ) * 0.5; };
 	e.actions.knob[17] = { |sl| ~canto.snareFreq = sl.value.linexp(0,1,250,5000); };
 	e.actions.knob[16] = { |sl| ~canto.snareDisperse = sl.value.linexp(0,1,0.0001,0.1); };
+	e.actions.button.on[17] = { |bt| ~canto.snareBrassage = bt.value; };
 
 	//e.masterKnob.value = 0;
 	~canto.bassCtrl.put( \bassAmp, { 
