@@ -1,7 +1,7 @@
 
 // TR-909 style kick
 (
-SynthDef( "bassdrum", { |amp = 0.25, freq = 44, pulse = 0.1, attackFreq = 100, decay = 0.075,
+SynthDef( "bassdrum", { |amp = 0.25, freq = 42, pulse = 0.1, attackFreq = 100, decay = 0.075,
 		sustain = 3, pan = 0|
 	var sig;
 	sig = BLowPass.ar( Impulse.ar(0,0,pulse), 8000 );
