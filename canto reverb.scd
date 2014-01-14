@@ -66,9 +66,9 @@ SynthDef( "ws_verb%_sum".format( q.verb.n ), { |in = 0, amp = 0.33, preDelay = 0
 q.verb.danStowel = {|evt| 
 	var ir, f;
 	//synthesise the honourable 'Dan Stowell' impulse response
-	ir = ((0..evt.dur*44100).linlin(0,evt.dur*44100,1,0.125).collect{|f| f =
+	ir = ( (0!(evt.fftsize/2)) ++ ((0..evt.dur*44100).linlin(0,evt.dur*44100,1,0.125).collect{|f| f =
 	f.squared.squared; f = if(f.coin){0}{f.squared}; f =
-	if(0.5.coin){0-f}{f}  }) * (-27.dbamp);
+	if(0.5.coin){0-f}{f}  }) ++ (0!(evt.fftsize/2)) ) * (-27.dbamp);
 };
 
 q.verb.prepare = { |evt, action|
