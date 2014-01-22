@@ -45,4 +45,34 @@
 		.action_({ Document.open( item ) });
 });
 
+~canto.startAll = { |evt|
+	evt.delay.global.start;
+	evt.delay.input.start;
+	evt.delay.input.amp = 0;
+	evt.ir.start;
+	evt.start;
+	NanoKONTROL.setScene(0);
+};
+
+~canto.endAll = { |evt|
+	evt.end;
+	evt.ir.stop;
+	[
+		\delay,
+		\revDelay,
+	].do({ |item| 
+		evt[item].global.end;
+		evt[item].input.end;
+	});
+	
+	[
+		\freeze1,
+		\fastFreeze,
+		\fastFreeze2,
+		\clicks,
+	].do({ |item| 
+		evt[item].end;
+	});
+};
+
 )
