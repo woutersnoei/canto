@@ -183,9 +183,11 @@
 ~canto.useNoteWindow = Window("useNote", Rect(300, 330, 226, 50)).front;
 ~canto.useNoteWindow.addFlowLayout;
 ~canto.useNoteButtons = 5.collect({ |i|
-	SmoothButton(~canto.useNoteWindow, 40@40 )
-		.radius_(4)
-		.label_([ "", 'x' ])
+	Button(~canto.useNoteWindow, 40@40 )
+		//.radius_(4)
+		.states_( [ [ "" ], [ "X" ] ] )
+		.font_( Font( "Helvetica-Bold", 30 ) )
+		//.label_([ "", "x" ])
 		.value_( ~canto.useNote[i].binaryValue )
 		.action_({ |bt| ~canto.useNote[i] = bt.value.booleanValue });
 });

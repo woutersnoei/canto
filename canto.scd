@@ -4,6 +4,11 @@
 // W. Snoei 2012
 
 (
+/*
+RoundView.dontRefresh = false;
+
+RoundView.dontRefresh = true;
+*/
 
 ~canto = ~canto ? EM();
 
