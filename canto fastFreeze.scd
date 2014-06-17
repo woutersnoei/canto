@@ -218,6 +218,7 @@ SynthDef( "canto_fastFreeze", { |amp = 0.1, active = 1, spd = 5, modrange = 0, g
 	modsig = (modsig * (1-(modrange.sqrt))) + ( Splay.ar( 
 			SinOsc.ar( Rand(0.5.dup(6),1.5) * spd.lag(2), Rand(0.dup(6), 2pi )).max(0) ** 4 
 		) * modsig * modrange * 2);
+	modsig = OnePole.ar( modsig, LFDNoise3.kr(0.1.dup, 0.5, 0.5).scurve.linlin(0,1,-0.95,0.95) );
 	modsig = BHiCut.ar( modsig, lpf.clip(20,20000).lag(4), 3 );
 	modsig = BLowCut.ar( modsig, hpf.clip(20,20000).lag(4), 3 );
 	
