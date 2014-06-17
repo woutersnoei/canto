@@ -10,3 +10,24 @@
 gwyneth: 35 & 78 niet te lang
 
 omslaan: na 17, 40, 74, 83
+
+kdag:
+
+cel 30 knik erik
+~canto.currentIndex = 74; // cel 70
+
+8 t/m 19 4x
+17 2x
+
+
+
+
+
+
+
+
+
+
+
+
+

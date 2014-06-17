@@ -509,6 +509,13 @@ TempoClock.tempo = 59/60;
 
 ~canto.currentIndex = ~canto.currentIndex + 1;
 
+~canto.currentIndex = 19;
+~canto.currentIndex = 45;
+
+~canto.currentIndex = 64;
+
+~canto.currentIndex 
+
 ~canto.end;
 
 
